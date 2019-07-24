@@ -1,0 +1,370 @@
+%************************************************
+% RANDOM STUFF
+%************************************************
+
+\chapter*{Notes}
+\addcontentsline{toc}{chapter}{Notes}
+\chaptermark{Notes}
+% \minitoc
+
+\paragraph{Topics}
+\begin{itemize}
+    \item Intro (big summary of the thesis)
+    \subitem Problem statement
+    \subitem What (GNN, LSTM, etc.)
+    \item Background (theoretical explanation of models used and SOTA)
+    \subitem Machine learning methods
+    \subitem Neural Networks
+    \subitem Dense
+    \subitem LSTM
+    \subitem Conv
+    \subitem GNN
+    \subitem Seizure prediction
+    \subitem EEG
+    \subitem Functional connectivity network
+    \subitem State of the art
+    \item Methods (description of all the work done and motivations, but no numbers)
+    \subitem Baseline
+    \subitem Graph / contribution
+    \item Experiments/Implementation (technical description of all the work done with parameters and numbers)
+    \subitem Environment (software, server, framework)
+    \subitem Data + preprocessing
+    \subitem Architectures (params)
+    \subitem Results
+    \item Conclusions
+    \subitem Comments
+    \subitem Future work
+\end{itemize}
+
+\paragraph{Project steps}
+\begin{itemize}
+    \item Baseline
+    \subitem Detection
+    \subitem --- Random Forest
+    \subitem --- Gradient Boosting
+    \subitem --- SVM
+    \subitem --- Dense
+    \subitem --- LSTM
+    \subitem --- \textbf{TODO} Convolution
+    \subitem Prediction
+    \subitem --- LSTM
+    \subitem --- Convolution
+    \subitem ------ \textbf{TODO} Stride > 1 and bigger look\_back
+    \subitem ------ \textbf{TODO} Parameters search
+    \item Graph Neural Networks
+    \subitem \textbf{TODO} GNN + LSTM
+    \subitem \textbf{TODO} GNN + Conv1D
+    \subitem \textbf{TODO} Pooling
+    \subitem --- \textbf{TODO} Hierarchical (Rex Ying)
+    \subitem --- \textbf{TODO} Decimation (Bianchi)
+    \item Baseline
+    \subitem \textbf{TODO} Cross Validation on 3 seizures
+    \subitem \textbf{TODO} Bayesian optimization
+    \subitem \textbf{TODO} Different functional connectivity nets
+    \subitem \textbf{TODO} Big data
+    \subitem \textbf{TODO} Structural connectivity (KNN)
+\end{itemize}
+
+
+\section{General considerations}
+
+\subsection{IEEG plots}
+\paragraph{} The ieeg plots give an overall idea of the type of data to deal with and of the shape of the patient's seizures. On 24 hours of recording, there are three seizures in the first 3 hours. The data is divided in clips of 1 hour each, containing 1800000 timestamps each (the signal is sampled at 500Hz). The three seizures found have a duration between 13000 and 15000 timestamps each (between 26 and 30 seconds).
+
+The ieeg doesn't explicitly show the presence of a seizure; indeed the dynamic of the electrodes signals doesn't change in correspondence of the beginning of a seizure. For example, in the first seizure the signals dynamic remains pretty stable during the first half of the seizure and suddenly changes at the beginning of the second half of the seizure. This behaviour suggests that the seizure is not directly represented by the dynamic of the signals, but it is represented by the non-linear relations between the electrodes behaviours.
+
+The ieeg plots show an interesting thing: in all the three seizures, there are two electrodes that are more dynamic exactly during the seizure. In the plots they are always represented with green colour.
+\begin{itemize}
+    \item classic plot (with y values): electrodes signals positioned at -5000 and 2500.
+    \item norm plot (y normalised): electrodes signals positioned at 8th position from the top and 33th position from the bottom.
+\end{itemize}
+
+
+\section{Machine learning classic models}
+
+\subsection{Experiments with classic methods}
+\paragraph{} The three machine learning classic methods used to perform experiments are random forest, gradient boosting and support vector machine. All the three methods have been implemented using scikit learns modules; for gradient boosting also xgboost library has been used. For all the experiment just portions containing seizures of the entire dataset have been used to train and to test data in order to speed up the process and to reduce the huge difference of availability of data between the two classes.
+
+Classic methods have been used only for the detection task, since they are not powerful enough in order to deal with the prediction task, at least with this kind of data.
+
+\paragraph{Parameters:}
+\begin{itemize}
+    \item random forest:
+        \subitem number of estimators: 100
+        \subitem maximum depth: 10
+        \subitem both balanced and non-balanced class weight
+    \item gradient boosting:
+        \subitem number of estimators: 100
+        \subitem maximum depth: 10
+    \item svm:
+        \subitem gamma: scale
+        \subitem both weighted and non-weighted classes
+\end{itemize}
+
+In all the experiments, seizure 2 and 3 have been used as training set, while seizure 1 has been used as test set.
+\todo[inline]{Maybe try to cross-validate by exchanging datasets for training and testing.}
+
+\paragraph{Results:} All the experiments had almost the same results:
+\begin{itemize}
+    \item Loss: around 0.15
+    \item Accuracy: around 0.85
+    \item Roc auc: around 0.65
+\end{itemize}
+
+Only the unbalanced random forest was able to get almost decent results:
+\begin{itemize}
+    \item Loss: 0.11
+    \item Accuracy: 0.85
+    \item Roc auc: 0.73
+\end{itemize}
+
+The results are very bad and show that the classic methods are too weak to be able to solve this problem having to deal with such a complex and unbalanced dataset. Indeed, the area under the Roc curve is around 0.65 for the majority of the models, which means that the predictions are made almost in a random way.
+\todo[inline]{Maybe try using some different metric (ex. F1)}
+
+The predictions have also been plotted in order to have a better idea of what was predicted wrong and where and also the plots show a non-logical distribution, even if in some cases (for example in the non-balanced experiment with the random forest) the predictions in the seizure area seem to match with the targets. Also in the gradient boosting experiment, the model seems to start predicting 1 (there is a seizure) in the same timestamps in which the signals in the ieeg start to be more dynamic (almost in the middle of the seizure 1).
+
+
+\section{Deep learning classic models}
+
+\subsection{Dense neural network}
+
+A dense neural network have been built in order to deal with the seizure detection task. After some hyperparameters tuning, the final structure of the network was the following:
+
+\paragraph{Parameters:} These are the parameters used in the network's layers.
+\begin{itemize}
+    \item[-] activation: tanh
+    \item[-] kernel regularisation: L2(5e-4)
+    \item[-] class weight: \{0: len(y\_train) / n\_negative, len(y\_train / n\_positive\}
+\end{itemize}
+
+\paragraph{Structure:} These are the layers used to build the network.
+\begin{lstlisting}
+Dense(units: 512)
+Dropout(0.5)
+Dense(units: 512)
+Dropout(0.5)
+Dense(units: 256)
+Dropout(0.5)
+Dense(units: 1, activation: 'sigmoid')
+\end{lstlisting}
+
+In order to compile the model, binary cross-entropy has been used as loss and Adam as optimiser.
+
+Initially the structure was composed by less layers and each one with less units (ex. 128, 156), but the model wasn't powerful enough so both the number of layers and units have been increased. The kernel regularisation and the dropout layers have been added in order to avoid overfitting on training data. For the activation of the dense layers, both tanh and ReLu have been tried, but for some reason tanh works way better. Since the two classes of the problem, that are "seizure" (1) and "not-seizure" (0), are very unbalanced due to the small presence of seizure timestamps with respect to the number of non-seizure timestamps, class weight has been used to train the network. The weight assigned to each class is inversely proportional to the number of timestamps of that class with respect to the total number of timestamps.
+
+Initially, in order to preprocess the data, the MinMaxScaler from scikit-learn library was used, but then it was substituted by the StandardScaler because this one led to better performances. The data are also shuffled in order to help the network to generalise.
+
+Initially, as for the machine learning classic methods, just portions containing seizures of the entire dataset have been used to train and to test data. In order to do some test, a modification of the initial dataset has been tried: the dataset has been modified so that each clip is trimmed ending with the end of the seizure and starting 100,000 timestamps before the end of the seizure. The intention of this test was to eliminate the useless bias generated by the timestamps after the seizure. However, after testing it, for some reason the results got a lot worse, so the old portions of the dataset have been used for the next experiments.
+
+\paragraph{Results} After all the tuning described above, the best results that the dense network got on the detection task were the following:
+\begin{itemize}
+    \item Loss: 0.87
+    \item Accuracy: 0.79
+    \item Roc auc: 0.74
+\end{itemize}
+
+These results are not extremely good but they are ok considering the complexity of the problem. The dense network behaved in a similar way to the unbalanced random forest, looking at the results. Looking at the plots of the predictions, they don't seem to be very promising, but in order to better understand the behaviour of the prediction, also the running mean have been plotted and it explicitly shows that the network is able to understand where is the seizure.
+
+A strange thing happens in the predictions: in the test prediction plot, there is a sort of a "hole" of zero predictions right after the end of the seizure.
+
+\subsection{LSTM neural network}
+
+\paragraph{} I built an LSTM network in order to deal both with the detection and the prediction tasks.
+
+For this network, I introduced subsampling to the data preprocessing. The subsampling function take as input the subsampling factor, which represent how many negative examples we want to keep with respect to the positive ones. In this way, we can consistently reduce the disparity in the amount of positive and negative examples, preserving all the positive ones. The subsampling was performed both for the detection and the prediction task. The subsampling factor was set to 2, so that for each positive samples there are two negative ones. The stride in the subsampling was set to 1 in order to keep all the (positive) samples.
+
+Another function was used in order to generate the sequences of data and labels to give as input to the network. It takes the parameters "look\_back", which is the length of the input sequence (how many samples do I look behind), and "target\_steps\_ahead", which represents how many steps ahead to predict (how many samples there are between the end of the input sequence and the future sample I want to predict). Given this two parameters, it creates the pairs input\_sequence - target accordingly.
+
+For the detection task, the parameter "target\_steps\_ahead" was set to 0, that is the target corresponding to the last sample of the input sequence. For the prediction task, obviously the parameter was set to some values higher than 0, as we want to predict the target of a sample in the future, that wasn't inside the input sequence.
+
+\paragraph{Detection task} For the detection task, after some hyperparameter search and tuning, the best result was given by these parameters (experiment 147):
+\begin{lstlisting}
+epochs:			10
+batch_size:		64
+depth_lstm:		1
+depth_dense:	2
+units_lstm:		256
+reg:            l2(5e-1)
+activation:		relu
+batch_norm:		True
+dropout:        0.4
+class_weight:	{0: 0.4682, 1: 3.0}
+look_back:		100
+stride:			1
+predicted_timestamps:	1
+target_steps_ahead:		0
+subsampling_factor:		2
+\end{lstlisting}
+
+The network was build in this way:
+
+\begin{lstlisting}
+LSTM(units: 256)
+BatchNormalization()
+Dropout(0.4)
+Dense(units: 256)
+BatchNormalization()
+Dropout(0.4)
+Dense(units: 1, activation: 'sigmoid')
+\end{lstlisting}
+
+The results on an input sequence of length 100 were:
+
+\begin{itemize}
+    \item Loss: 0.2632
+    \item Accuracy: 0.9059
+    \item Roc auc: 0.9263
+\end{itemize}
+
+\paragraph{Prediction task} For the prediction task, after some hyperparameter search and tuning, the best result was given by these parameters (experiment 20):
+\begin{lstlisting}
+epochs:			10
+batch_size:		64
+depth_lstm:		1
+depth_dense:	2
+units_lstm:		256
+reg:            l2(5e-1)
+activation:		relu
+batch_norm:		True
+dropout:        0.4
+class_weight:	{0: 1.1561, 1: 7.4074}
+look_back:		200
+stride:			1
+predicted_timestamps:	1
+target_steps_ahead:		2000
+subsampling_factor:		2
+\end{lstlisting}
+
+The network was build in this way:
+
+\begin{lstlisting}
+LSTM(units: 256)
+BatchNormalization()
+Dropout(0.4)
+Dense(units: 256)
+BatchNormalization()
+Dropout(0.4)
+Dense(units: 1, activation: 'sigmoid')
+\end{lstlisting}
+
+The results on an input sequence of length 100 and a target steps ahead of 2000 were:
+
+\begin{itemize}
+    \item Loss: 0.3098
+    \item Accuracy: 0.9454
+    \item Roc auc: 0.9337
+\end{itemize}
+
+The network that performed better was the same for both the detection and prediction tasks, even with the same regularisation parameters. What changed was, of course, the distance of the sample predicted and the length of the input sequence. The LSTM, in both the situation, wasn't able to deal with more than 200 samples in the input sequence (the results were way worse with a higher value). For the prediction task, the network was able to successfully predict until 2000 steps ahead, which correspond to 4 seconds. Higher than that, the prediction became almost random.
+
+
+\subsection{Convolutional neural network}
+
+\paragraph{} I built a CNN in order to deal both with the detection and the prediction tasks.
+
+For this network, as for the LSTM, I introduced subsampling to the data preprocessing (see LSTM).The subsampling was performed both for the detection and the prediction task. The subsampling factor was set to 2, so that for each positive samples there are two negative ones. Another function was used in order to generate the sequences of data and labels to give as input to the network (see LSTM).
+
+\paragraph{Detection task} For the detection task, we used the same parameter we found for the LSTM, except for the look\_back, that in the case of the convolutional can be much higher. The best result was given by these parameters (experiment 2):
+\begin{lstlisting}
+epochs:			10
+batch_size:		64
+depth_conv:		5
+depth_dense:	2
+filters:        512
+kernel_size:	5
+reg:            l2(5e-1)
+activation:		relu
+batch_norm:		True
+dropout:        0.4
+class_weight:	{0: 1.1561, 1: 7.4074}
+look_back:		1000
+stride:			1
+predicted_timestamps:	1
+target_steps_ahead:		0
+subsampling_factor:		2
+\end{lstlisting}
+
+\todo[inline]{Run again experiments for detection with CNN using less filters and smaller kernel size}
+
+The network was build in this way:
+
+\begin{lstlisting}
+Conv1D(filters: 512)
+MaxPooling1D()
+Conv1D(filters: 512)
+MaxPooling1D()
+Conv1D(filters: 512)
+MaxPooling1D()
+Conv1D(filters: 512)
+MaxPooling1D()
+Conv1D(filters: 512)
+MaxPooling1D()
+Flatten()
+Dense(units: 256)
+BatchNormalization()
+Dropout(0.4)
+Dense(units: 1, activation: 'sigmoid')
+\end{lstlisting}
+
+The results on an input sequence of length 1000 were:
+
+\begin{itemize}
+    \item Loss: 0.1550
+    \item Accuracy: 0.9374
+    \item Roc auc: 0.9870
+\end{itemize}
+
+\paragraph{Prediction task} For the prediction task, I began with some hyperparameter search and tuning using the same parameters used for the LSTM as initial model. The best result was given by these parameters (experiment 29):
+\begin{lstlisting}
+epochs:			10
+batch_size:		64
+depth_conv:		5
+depth_dense:	2
+filters:        256
+kernel_size:	5
+reg:            l2(5e-1)
+activation:		relu
+batch_norm:		True
+dropout:        0.4
+class_weight:	{0: 1.1560, 1: 7.4074}
+look_back:		1000
+stride:			1
+predicted_timestamps:	1
+target_steps_ahead:		2000
+subsampling_factor:		2
+\end{lstlisting}
+
+The network was build in this way:
+
+\begin{lstlisting}
+Conv1D(filters: 256)
+MaxPooling1D()
+Conv1D(filters: 256)
+MaxPooling1D()
+Conv1D(filters: 256)
+MaxPooling1D()
+Conv1D(filters: 256)
+MaxPooling1D()
+Conv1D(filters: 128)
+MaxPooling1D()
+Flatten()
+Dense(units: 256)
+BatchNormalization()
+Dropout(0.4)
+Dense(units: 1, activation: 'sigmoid')
+\end{lstlisting}
+
+The results on an input sequence of length 100 and a target steps ahead of 2000 were:
+
+\begin{itemize}
+    \item Loss: 0.2598
+    \item Accuracy: 0.9314
+    \item Roc auc: 0.9274
+\end{itemize}
+
+For the prediction task, the network was able to successfully predict until 2000 steps ahead, which correspond to 4 seconds. Higher than that, the prediction became almost random.
+
+
+\todo[inline]{CNN notes}
+
+
