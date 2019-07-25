@@ -309,20 +309,20 @@ Each neuron processes the input data by computing a linear transformation, that 
 Each neuron in a layer performs these operation and the outputs of all the neurons of that layer will be the inputs for the next layer. Formally, the inputs and outputs of layers of a neural network can be described by the equations:
 \begin{align}
     &h^{\textit{out}}_{0} = \mathbf{X}\qquad\qquad\qquad \text{(input layer)}\\
-    &h^{\textit{in}}_{i} = h^{\textit{out}}_{i-1} \times W_i + B_i\\
-    &h^{\textit{out}}_{i} = \sigma_i (h^{\textit{in}}_{i})
+    &h^{\textit{in}}_{i} = h^{\textit{out}}_{i-1} \times \mathbf{W}_i + \mathbf{B}_i\\
+    &h^{\textit{out}}_{i} = \phi_i (h^{\textit{in}}_{i})
 \end{align}
-where $\mathbf{X}$ is the features matrix of input data, $W_i$ is the weights matrix of layer $i$, $B_i$ is the bias vector of layer $i$, $\sigma_i$ is the activation function used by neurons of layer $i$, and the operator $\times$ represents matrix multiplication.
+where $\mathbf{X}$ is the features matrix of input data, $\mathbf{W}_i$ is the weights matrix of layer $i$, $\mathbf{B}_i$ is the bias vector of layer $i$, $\phi_i$ is the activation function used by neurons of layer $i$, and the operator $\times$ represents matrix multiplication.
 
 \subsection{Dense neural network}
 \paragraph{} A dense neural network (or fully-connected neural network) is a network that consists of a sequence of fully-connected layers \cite{OReilly:TFforDL}. Each layer represents a function (linear and non-linear transformations) from $\mathbb{R}^F$ to $\mathbb{R}^{F_m}$. This means that, for each input instance having $F$ features, the corresponding output will have dimensionality $F_m$, where $F_m$ is the number of neurons in the network's output layer (the $m$-th layer). Even for the hidden layers, the output dimension depends on the number of neurons present in the layer.
 
-The network is called \textit{fully-connected} because the output of each neuron in one layer is sent as input of each neuron in the next layer, so there is a direct connection between all the neurons belonging to subsequent layers. Figure \ref{fig:dense_nn} shows and example of dense neural network, making visible the full interconnection between subsequent layers.
+The network is called \textit{fully-connected} because the output of each neuron in one layer is sent as input of each neuron in the next layer, so there is a direct connection between all the neurons belonging to subsequent layers. Figure \ref{fig:nn_dense} shows and example of dense neural network, making visible the full interconnection between subsequent layers.
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.9\textwidth]{dense_nn}
+    \includegraphics[width=0.9\textwidth]{nn_dense}
     \caption{Example of dense neural network}
-    \label{fig:dense_nn}
+    \label{fig:nn_dense}
 \end{figure}
 
 For each training input instance, the model computes the output of every neuron in each consecutive layer until it reaches the final predictions from the output layer (\textit{forward pass)}. After that, it compares its prediction with the actual targets and measures the output error. The error is then propagated through each layer in reverse in order to compute the error contribution (error gradient) from each neuron's connection, until it reaches the input layer (\textit{backward pass}). The error is then used by the optimizer to update the connections weights and allow the model to learn. Dense neural networks are included in the category of feed-forward neural networks, since the activation flows only in one direction.
@@ -332,9 +332,88 @@ When used for classification tasks, the output layer of a dense neural network h
 \subsection{LSTM neural network}
 \paragraph{} LSTM neural networks are a special case of a more general category, which is the recurrent neural networks \cite{OReilly:handsonML}; therefore we are going to first present the basics of recurrent neural networks and then explore LSTM neural networks.
 
-Recurrent neural networks are usually used to analyze sequences of data and time series in order to predict the future, thanks to their ability to "memorize" past information. This is due to the fact that they are not feed-forward network, since the output of a neuron is sent back to itself. In other words, at each time step $t$, a recurrent neuron receives the features of the input $x_t$ as well as its own output $y_{t-1}$ from the previous time step. In this way, each input of a recurrent neuron is determined by the current input instance alongside with some information from all the previous instances.
+Recurrent neural networks (RNN) are usually used to analyze sequences of data and time series in order to predict the future, thanks to their ability to "memorize" past information. This is due to the fact that they are not feed-forward network, since the output of a neuron is sent back to itself. In other words, at each time step $t$, a recurrent neuron receives the features of the input $x_t$ as well as its own output $y_{t-1}$ from the previous time step. In this way, each input of a recurrent neuron is determined by the current input instance alongside with some information from all the previous instances. Expanding this logic to an entire layer of recurrent neurons, at each time step $t$, each neuron receives both the input $x_t$ as well as the entire layer's output $y_{t-1}$ from the previous time step. Figure \ref{fig:nn_recurrent} illustrates the logic behind a recurrent neural network, showing the network unrolled through time.
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=1\textwidth]{nn_recurrent}
+    \caption{Logic behind a recurrent neural network}
+    \label{fig:nn_recurrent}
+\end{figure}
 
-Ciao
+Each recurrent neuron has two sets of weights, one for the inputs $x_t$ and the other for the previous output $y_{t-1}$. Naming $\mathbf{W}_x$ and $\mathbf{W}_y$ respectively these two sets of weights, we can rewrite the equation for the output $\mathbf{Y}_t$ of a recurrent layer:
+\begin{align}
+    \mathbf{Y}_t = \phi (\mathbf{X}_t \mathbf{W}_x + \mathbf{Y}_{t-1} \mathbf{W}_y + \mathbf{b})
+\end{align}
+where $\phi$ is the activation function of the layer and $\mathbf{b}$ is the bias. Concatenating the inputs $[\begin{array}{ll}{\mathbf{X}_t} & {\mathbf{Y}_{t-1}}\end{array}]$ and the weights $\mathbf{W} = \left[\begin{array}{c}{\mathbf{W}_x} \\ {\mathbf{W}_y}\end{array}\right]$, we can rewrite the equation as:
+    \begin{align}
+        \mathbf{Y}_t = \phi ([\begin{array}{ll}{\mathbf{X}_t} & {\mathbf{Y}_{t-1}}\end{array}] \mathbf{W} + \mathbf{b})
+    \end{align}
+
+It should be clear by now that each output at time step $t$ is a function of the inputs from all the previous time steps. For this reason, we can say that the network is able to store some sort of "memory" of the past inputs and to use this information for the outputs of the the following time steps. A neuron, or layer of neurons, that is able to preserve some state across time steps is called a \textit{memory cell}. A cell's state at time $t$ can be denoted with $\mathbf{h}_t$, which corresponds to a function $\mathbf{h}_t = f(\mathbf{h}_{t-1}, \mathbf{x}_t)$. In the case of basic memory cells like the ones in a recurrent neural network, the element $\mathbf{h}_{t-1}$ corresponds exactly to the notation $\mathbf{y}_{t-1}$ that we used until now to denote the output from the previous time step.
+
+The classic recurrent neural network model presents some drawbacks. First of all, when the network is trained on long sequences, it may suffer form the vanishing/exploding gradient problem, taking forever to train. Moreover, on the long run, the memory of information about the first time steps tends to fade away, since part of the information is lost at each step. We could consider the RNN to have a short-term memory, which is not optimal when we need to predict events based on a long sequence of time steps. That is where the LSTM neural network comes in.
+
+An LSTM neural network, differently from a RNN, is made of \textit{Long Short-Term Memory} (LSTM) cells \cite{NeuralComputation:lstm}. This type of cells allows the model to perform much better and to converge faster, in addition to preserving long-term information in long sequences. As shown in Figure \ref{fig:rnn_vs_lstm}, while the standard RNN cell contains only a single layer, the LSTM cell contains four interacting layers, each one having a well-defined purpose.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[t]{0.8\textwidth}
+		\includegraphics[width=1\textwidth]{nn_simplernn}
+        \caption{Standard RNN cell}
+        \label{fig:nn_simplernn}
+	\end{subfigure}
+	~
+	\begin{subfigure}[t]{0.8\textwidth}
+		\includegraphics[width=1\textwidth]{nn_lstm}
+        \caption{LSTM cell}
+        \label{fig:nn_lstm}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[t]{0.6\textwidth}
+		\includegraphics[width=1\textwidth]{nn_lstm_notation}
+        \caption{Image notation}
+        \label{fig:nn_lstm_notation}
+	\end{subfigure}
+    \caption{Difference between a standard RNN cell and a LSTM cell (from \textit{colah's blog})}
+    \label{fig:rnn_vs_lstm}
+\end{figure}
+
+An LSTM cell keeps "in memory" two states, one for the short-term memory and the other for the long-term memory, respectively $\mathbf{h}_t$ and $\mathbf{C}_t$.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[t]{0.8\textwidth}
+		\includegraphics[width=1\textwidth]{nn_lstm_step1}
+        \caption{}
+        \label{fig:nn_lstm_step1}
+	\end{subfigure}
+	~
+	\begin{subfigure}[t]{0.8\textwidth}
+		\includegraphics[width=1\textwidth]{nn_lstm_step2}
+        \caption{}
+        \label{fig:nn_lstm_step2}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[t]{0.8\textwidth}
+		\includegraphics[width=1\textwidth]{nn_lstm_step3}
+        \caption{}
+        \label{fig:nn_lstm_step3}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[t]{0.8\textwidth}
+		\includegraphics[width=1\textwidth]{nn_lstm_step4}
+        \caption{}
+        \label{fig:nn_lstm_step4}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[t]{0.8\textwidth}
+		\includegraphics[width=1\textwidth]{nn_lstm_step5}
+        \caption{}
+        \label{fig:nn_lstm_step5}
+    \end{subfigure}
+    \caption{Elements in an LSTM cell step-by-step (from \textit{colah's blog})}
+    \label{fig:lstm_steps}
+\end{figure}
 
 \subsection{Convolutional neural network}
 
