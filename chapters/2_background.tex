@@ -353,9 +353,8 @@ It should be clear by now that each output at time step $t$ is a function of the
 
 The classic recurrent neural network model presents some drawbacks. First of all, when the network is trained on long sequences, it may suffer form the vanishing/exploding gradient problem, taking forever to train. Moreover, on the long run, the memory of information about the first time steps tends to fade away, since part of the information is lost at each step. We could consider the RNN to have a short-term memory, which is not optimal when we need to predict events based on a long sequence of time steps. That is where the LSTM neural network comes in.
 
-An LSTM neural network, differently from a RNN, is made of \textit{Long Short-Term Memory} (LSTM) cells \cite{NeuralComputation:lstm}. This type of cells allows the model to perform much better and to converge faster, in addition to preserving long-term information in long sequences. As shown in Figure \ref{fig:rnn_vs_lstm}, while the standard RNN cell contains only a single layer, the LSTM cell contains four interacting layers, each one having a well-defined purpose.
-
-\begin{figure}[htbp]
+An LSTM neural network, differently from a RNN, is made of \textit{Long Short-Term Memory} (LSTM) cells \cite{NeuralComputation:lstm}. This type of cells allows the model to perform much better and to converge faster, in addition to preserving long-term information in long sequences. As shown in Figure \ref{fig:rnn_vs_lstm}, while the standard RNN cell contains only a single layer (showed as a yellow box), the LSTM cell contains four interacting layers, each one having a well-defined purpose. An LSTM cell keeps "in memory" two states, one for the short-term memory and the other for the long-term memory, respectively $\mathbf{h}_t$ and $\mathbf{C}_t$ (also called \textit{cell state}). The first one is the same that we saw for classic recurrent network's cells, while the cell state is what makes the LSTM model so special.
+\begin{figure}[t]
     \centering
     \begin{subfigure}[t]{0.8\textwidth}
 		\includegraphics[width=1\textwidth]{nn_simplernn}
@@ -378,35 +377,48 @@ An LSTM neural network, differently from a RNN, is made of \textit{Long Short-Te
     \label{fig:rnn_vs_lstm}
 \end{figure}
 
-An LSTM cell keeps "in memory" two states, one for the short-term memory and the other for the long-term memory, respectively $\mathbf{h}_t$ and $\mathbf{C}_t$.
+In addition to the three inputs $\mathbf{x}_t$, $\mathbf{h}_{t-1}$ and $\mathbf{C}_{t-1}$, the LSTM cell makes use of four different fully connected layer, three of them using a sigmoid activation function and the remaining one using a tanh activation function. Each one of the sigmoid activation outputs goes through a \textit{gate}, indicated in Figure \ref{fig:rnn_vs_lstm} with the symbol $\otimes$, representing an element-wise multiplication. Gates use the output of the sigmoids (between 0 and 1) to determine how much information should be let through. Let's dive into the functioning of an LSTM cell.
 
-\begin{figure}[htbp]
+The cell state allows the network to decide what to store in the long-term memory and what to discard. Traversing the cell from left to right (Figure \ref{fig:nn_lstm_step1}), the cell states goes through two operations, the first being the \textit{forget gate} and the second being and addition operation. The forget state determines which long-term information to drop from $\mathbf{C}_{t-1}$ and it is controlled by the first sigmoid layer's output $f_t$, calculated from $\mathbf{x}_t$ and $\mathbf{h}_{t-1}$ (Figure \ref{fig:nn_lstm_step2}). The addition operation, on the other hand, adds information to the cell state based on the output of the \textit{input gate}, which determines which new information coming from $\mathbf{x}_t$ and $\mathbf{h}_{t-1}$ will be stored in the cell state (Figure \ref{fig:nn_lstm_step4}). The input gate is controlled by the second sigmoid layer's output $i_t$ and by the tanh layer's output $\tilde{C}_t$ (Figure \ref{fig:nn_lstm_step3}). After that, the long-term state $\mathbf{C}_t$ is ready to be output, but before that, its state is copied to be passed to a than activation function and to be filtered by the last gate, which is the \textit{output gate}, controlled by the third sigmoid layer's output $o_t$ (Figure \ref{fig:nn_lstm_step4}). This operation is essential in order to produce the short-term state $\mathbf{h}_t$ to output.
+
+To sum up the fully-connected layer's roles:
+\begin{itemize}
+    \item The tanh layer that outputs $\tilde{C}_t$ takes as inputs $\mathbf{x}_t$ and $\mathbf{h}_{t-1}$ and it is the same that we find in a basic recurrent cell. The result is partially stored as new information in the long-term state.
+    \item The sigmoid layer that outputs $f_t$ takes as inputs $\mathbf{x}_t$ and $\mathbf{h}_{t-1}$ and it controls the forget gate. Based on the result, some parts of the long-term state are erased.
+    \item The sigmoid layer that outputs $i_t$ takes as inputs $\mathbf{x}_t$ and $\mathbf{h}_{t-1}$ and it controls the input gate. Based on the result, some parts of the new information in $\tilde{C}_t$ are added to the long-term state.
+    \item The sigmoid layer that outputs $o_t$ takes as inputs $\mathbf{x}_t$ and $\mathbf{h}_{t-1}$ and it controls the output gate. Based on the result, some parts of the long-term state are read and output as $\mathbf{h}_t$.
+\end{itemize}
+All the equations for the different outputs can be found in Figure \ref{fig:lstm_steps}.
+
+Through this process, the LSTM model is able to preserve important information through time and to understand which are the essential inputs to keep and what to discard. This allows the network to learn long-term pattern in the data.
+\newpage
+\begin{figure}[H]
     \centering
-    \begin{subfigure}[t]{0.8\textwidth}
+    \begin{subfigure}[t]{0.7\textwidth}
 		\includegraphics[width=1\textwidth]{nn_lstm_step1}
         \caption{}
         \label{fig:nn_lstm_step1}
 	\end{subfigure}
 	~
-	\begin{subfigure}[t]{0.8\textwidth}
+	\begin{subfigure}[t]{0.7\textwidth}
 		\includegraphics[width=1\textwidth]{nn_lstm_step2}
         \caption{}
         \label{fig:nn_lstm_step2}
     \end{subfigure}
     ~
-    \begin{subfigure}[t]{0.8\textwidth}
+    \begin{subfigure}[t]{0.7\textwidth}
 		\includegraphics[width=1\textwidth]{nn_lstm_step3}
         \caption{}
         \label{fig:nn_lstm_step3}
     \end{subfigure}
     ~
-    \begin{subfigure}[t]{0.8\textwidth}
+    \begin{subfigure}[t]{0.7\textwidth}
 		\includegraphics[width=1\textwidth]{nn_lstm_step4}
         \caption{}
         \label{fig:nn_lstm_step4}
     \end{subfigure}
     ~
-    \begin{subfigure}[t]{0.8\textwidth}
+    \begin{subfigure}[t]{0.7\textwidth}
 		\includegraphics[width=1\textwidth]{nn_lstm_step5}
         \caption{}
         \label{fig:nn_lstm_step5}
@@ -414,8 +426,11 @@ An LSTM cell keeps "in memory" two states, one for the short-term memory and the
     \caption{Elements in an LSTM cell step-by-step (from \textit{colah's blog})}
     \label{fig:lstm_steps}
 \end{figure}
+\newpage
 
 \subsection{Convolutional neural network}
+
+\lipsum[1-5]
 
 \section{Functional connectivity and graph representation}
 \subsection{Functional connectivity}
