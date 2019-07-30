@@ -6,6 +6,10 @@
 
 \paragraph{} \textit{This chapter explains the theory behind the methods and techniques used in this project: it begins by describing the EEG data and presenting a formal definition of the problem; later, it presents logistic regression and the related evaluation metrics, followed by the description of activation functions, optimizers and regularizers used in the project; subsequently, it describes the classic machine learning models and deep learning models used and, finally, it presents the the functional connectivity, the graph representation and the graph-based deep learning models.}
 
+%------------------------------------------------
+% Epileptic seizures and EEG
+%------------------------------------------------
+
 \section{Epileptic seizures and EEG} \label{sec: epileptic_seizures_and_eeg}
 \paragraph{} An epileptic seizure is a disruption of the electrical signals in our brain \cite{EpilepsySociety:aboutepilepsy}. The brain controls the way we function millions of neurons, which pass messages to each other by electrical signals. If these signals are disrupted, our body and feelings are hugely influenced by this change.
 
@@ -23,6 +27,10 @@ EEG gives an overview of the activity of the brain cells, that is the traffic of
 The number of electrodes used can range from a few dozen to hundreds. They are positioned on specific sections of the patient's head, therefore different electrodes monitor the activity of different areas of the brain. In this way, by looking at the EEG and knowing the position of each electrode, the specialist can understand which areas of the patient's brain are involved in the seizure. The electrodes are identified based on whether they are placed on the left or right side of the head and also based on the lobe they are recording from (frontal lobes, temporal lobes, parietal lobes or occipital lobes). The EEG monitoring captures several types of brain waves, which differ in the frequency (waves per second). Specific ranges of frequencies are determined by particular moments of the day, situations and states of mind.
 
 The EEG is a very helpful tool for epilepsy diagnosis, but it can't show for certain the presence of epileptic seizures. In fact, despite the existence of typical signal patterns associated with epilepsy, usually epileptic seizures look very different on the EEG depending on the patient: some seizures are recognizable thanks to the presence of typical spikes in the electrical signals; other seizures happen without showing any visible change in the EEG. Therefore, we have reason to think that for some patients the seizure is "hidden" in the relations between signals behaviour, more than in the behaviour of each signal itself. Even when the change in the EEG pattern is clear, it could involve only a subset of electrodes (partial seizures) or all the electrodes (generalized seizures), and it is difficult to determine if the disruption of the signal is actually caused by epilepsy or if it simply represents an 'abnormal' EEG, which could happen without the presence of seizures.
+
+%------------------------------------------------
+% Problem definition
+%------------------------------------------------
 
 \section{Problem definition} \label{sec: problem_definition}
 \paragraph{} The focus of this thesis is on the seizure prediction problem, but we are going to analyze also the seizure detection task in order to have a clearer and more complete idea of the machine learning models potentialities on epileptic seizures data.
@@ -47,8 +55,11 @@ Let's consider a time portion of $T+1$ discrete instants in an EEG: the portion 
 \end{itemize}
 The first two cases are examples of a detection problem, since the target $y_{t+k}$ to predict is associated to an instant that is still inside the time window we look at to predict it ($k \leq T$). The third case, on the other hand, is a prediction problem, since the target $y_{t+k}$ to predict is associated to an instant that is outside the time window we look at to predict it and it is forwards in time with respect to the time window ($k > T$). The difficulty of the prediction task is that we cannot look at the features $x_t$ in order to predict the target $y_t$, but we have to rely on information from previous timestamps (for this reason, we consider $T>0$, since it would be almost impossible to predict the target based on a single sample backwards in time).
 
-\section{Logistic Regression} \label{sec: logistic_regression}
+%------------------------------------------------
+% Logistic Regression
+%------------------------------------------------
 
+\section{Logistic Regression} \label{sec: logistic_regression}
 \paragraph{} In this project, the binary classification problem related to epileptic seizure detection/prediction is approached using logistic regression. The logistic regression algorithm is used to estimate the probability that an instance belongs to a particular class \cite{OReilly:handsonML}. If the estimated probability is greater than a fixed threshold, which is commonly set to $0.5$, then the model assigns the instance to the positive class (in our case, \textit{seizure} class), otherwise it assigns the instance to the negative class (in our case, \textit{non-seizure}). In this way, logistic regression can be used as a binary classifier.
 
 Let's look at a very simple logistic regression model as an example: it computes the weighted sum of the input features $\mathbf{x}$ multiplied to the model parameter $\theta$ and it outputs the logistic of the result:
@@ -85,6 +96,10 @@ The log loss cost function is then used by an optimizer, for instance Gradient D
 
 The project models make use of the same process, but instead of using such a simple model consisting of only one parameter, we used a set of more complex machine learning models and applied logistic regression to each of them to build several binary classifiers.
 
+%------------------------------------------------
+% Metrics
+%------------------------------------------------
+
 \section{Metrics} \label{sec: metrics}
 \paragraph{} In order to evaluate the models, four metrics have been chosen, which are commonly used for binary classifiers: loss, accuracy, ROC-AUC and recall. The first two metrics are the most standard performance measures for all the machine learning models.
 
@@ -117,6 +132,10 @@ The false positive rate is the number of negative instances incorrectly classifi
 
 The ROC curve represents a plot of TPR and FPR at different classification thresholds: if we lower the threshold, the classifier predicts more items as positive, so both TPR and FPR increase. In order to find the best classification threshold, we need to find a tradeoff between TPR and FPR, trying to obtain a higher TPR as possible and a lower FPR as possible (looking at the curve, we need to find the point that is closest to the upper left corner). For this purpose we can rely on the \textit{area under the ROC curve} (AUC), which provides a performance measure for different classification thresholds. The ROC-AUC ranges
 from 0 to 1 and its value represents the quality of the classifier predictions. A perfect classifier has AUC = 1, while a completely random classifier has AUC = 0.5.
+
+%------------------------------------------------
+% Activation, optimization and regularization
+%------------------------------------------------
 
 \section{Activation, optimization and regularization} \label{sec: activation_optimization_regularization}
 \paragraph{} This section describes topics that are related only to the deep learning models.
@@ -198,7 +217,9 @@ where $\|\cdot\|_{2}$ represents the 2-norm and $m$ is the length of the weights
 
 Figure \ref{fig:dropout} shows and example of dropout applied to a simple dense neural network. The idea behind dropout is that the network cannot rely on the features of each individual neuron, because if an essential neuron is shut down, then the network is not able to perform well. By ignoring some percentage of different neurons at each training step, the model is forced to learn more robust features, that work well together with the features of other groups of neurons. In this way, it is not dependant on the features of few individual neurons, leading to a better generalization.
 
-
+%------------------------------------------------
+% Classic machine learning models
+%------------------------------------------------
 
 \section{Classic machine learning models}
 \paragraph{} Machine learning models are able to perform a specific task efficiently, without the need of explicit instructions, but relying uniquely on the patterns and features they learn from data. Giving the nature of this project's problem and the type of data we are working on, all the models that have been used have been trained in a supervised manner. This means that the training data fed to the algorithm includes the labels, that are the solutions to the problem. In the case of a classification task, the training data consist of both the data features and the respective classes of membership, so that the model can learn from examples and discover patterns that allow it to make good predictions on new data.
@@ -287,6 +308,10 @@ The hyperparameter $\gamma = \frac{1}{2 \sigma^{2}}$ can be used as regularizati
 
 The kernel trick can be used together with the soft-margin in order to reach good performance and better generalization.
 
+%------------------------------------------------
+% Classic deep learning models
+%------------------------------------------------
+
 \section{Classic deep learning models}
 \paragraph{} Deep learning is a subfield of machine learning that differentiate itself for the specific type of models that it uses in order to learn a certain task. These models are \textit{artificial neural networks}.
 
@@ -329,11 +354,62 @@ For each training input instance, the model computes the output of every neuron 
 
 When used for classification tasks, the output layer of a dense neural network has a number of neurons that is equal to the number of classes of the data. In this way, each output of the network (computed through softmax or sigmoid activation function) corresponds to the estimated probability that the input instance belongs to the corresponding class. The instance is then assigned to the class which obtained higher probability.
 
+\subsection{Convolutional neural network}
+\paragraph{} Convolutional neural networks (CNN) are feed-forward networks that work very well especially for image recognition and complex visual tasks in general \cite{OReilly:handsonML}. A typical CNN architecture consists of different building blocks: several conv-pool blocks, each one containing a convolutional layer and a pooling layer, followed by a regular dense neural network at the end (see Figure \ref{fig:nn_conv}). Each building block has a specific role: convolution layers identify low-level features in the image and learn to assemble them into higher-level features; pooling layers subsample the image in order to reduce its dimensionality; the dense network at the end of the architecture uses the extracted features to make a prediction. Let's look at the functioning of convolutional and pooling layers.
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=1\textwidth]{nn_conv}
+    \caption{Typical architecture of a convolutional neural network (from \textit{Medium - Towards Data Science})}
+    \label{fig:nn_conv}
+\end{figure}
+
+Convolutional layers are different from dense layers since they are not fully-connected: in convolutional layers, neurons are not connected to all previous layer's neurons, but only to neurons in their receptive fields. If we represent one layer's neurons mapped in 2D as a matrix, we can say that each neuron in the current matrix $l$ looks at a limited region of the previous matrix $l-1$, so it is connected only to neurons located within that region, as shown in Figure \ref{fig:nn_conv_layer}. This architecture allows to focus on low-level features in the first layer, where neurons look at small regions of the input image, and to aggregate them in high-level features in the following layers, where neurons combine lower-level features form the previous layer.
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.35\textwidth]{nn_conv_layer}
+    \caption{Relation between convolutional layer's neurons}
+    \label{fig:nn_conv_layer}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[t]{0.3\textwidth}
+		\includegraphics[width=1\textwidth]{nn_conv_padding}
+        \caption{Zero padding}
+        \label{fig:nn_conv_padding}
+	\end{subfigure}
+	~
+	\begin{subfigure}[t]{1\textwidth}
+		\includegraphics[width=1\textwidth]{nn_conv_stride}
+        \caption{Sequence of receptive fields with stride equal to 2}
+        \label{fig:nn_conv_stride}
+    \end{subfigure}
+    \caption{(from \textit{Medium - Towards Data Science})}
+    \label{fig:padding_stride}
+\end{figure}
+
+In order for a layer to have the same dimensionality of the previous layer, zero padding can be applied by adding a zero-frame to the previous layer (Figure \ref{fig:nn_conv_padding}). In order for a layer to have a much smaller dimensionality with respect to the previous layer, we can use a higher stride, which is the distance between two subsequent receptive fields. By default, the stride is set to 1, so usually the difference between two receptive fields is is one row/column of neurons; by increasing the stride, a smaller number of receptive fields is taken into consideration, therefore the following layers is much smaller (Figure \ref{fig:nn_conv_stride}).
+
+In a convolutional layer, neurons weights are represented by \textit{filters} (also called \textit{kernels}). A filter is a matrix of the same size of the receptive field and it contains the weights that are applied to the corresponding receptive field. The application of the same filter to all the receptive fields of an image produces a feature map, which identify and highlight the details of the image that are most similar to the filter. A convolutional layer is composed by several feature maps of equal size, that in practice corresponds to having multiple matrices of neuron stacked together generating a third dimension, which is the number of feature maps. In a convolutional layer, all neurons in the same feature map share the same weights and bias, so they all use the same filter, while from layer to layer the filter used is different. In this way, the convolutional layer applies different filters to the input image and each feature map can specialize on identifying a specific image feature. Figure \ref{fig:nn_conv_filter} shows a $3\times3$ filter applied over three feature maps (depth); for example, it could be the case of a color image composed of three color channels, which correspond to the three feature maps.
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.3\textwidth]{nn_conv_filter}
+    \caption{Movement of a $3\times3$ filter applied over three feature maps (from \textit{Medium - Towards Data Science})}
+    \label{fig:nn_conv_filter}
+\end{figure}
+
+Convolutional layers are usually followed by pooling layers. As already mentioned, the goal of a pooling layer is to subsample the input image in order to reduce its dimensionality; this action has the positive effects of cutting down the computational and memory loads and of reducing the number of parameters, thus diminishing the risk of overfitting. A pooling layer is very similar to a convolutional layer, since it is focused on a receptive field too and it has configurable size, padding and stride. The crucial difference is that a pooling layer doesn't have weights, but instead it aggregate all the information in a receptive field by using an aggregation function (for example the mean or max functions). The pooling layer works on every channel (or feature map) independently, so the output has the same depth as the input.
+
+Through convolutional and pooling layers, a CNN is able to learn high-level features, while reducing the data dimensionality, and to use this information to make predictions through the dense neural network at the end of the architecture.
+
+
+
+
 \subsection{LSTM neural network}
 \paragraph{} LSTM neural networks are a special case of a more general category, which is the recurrent neural networks \cite{OReilly:handsonML}; therefore we are going to first present the basics of recurrent neural networks and then explore LSTM neural networks.
 
 Recurrent neural networks (RNN) are usually used to analyze sequences of data and time series in order to predict the future, thanks to their ability to "memorize" past information. This is due to the fact that they are not feed-forward network, since the output of a neuron is sent back to itself. In other words, at each time step $t$, a recurrent neuron receives the features of the input $x_t$ as well as its own output $y_{t-1}$ from the previous time step. In this way, each input of a recurrent neuron is determined by the current input instance alongside with some information from all the previous instances. Expanding this logic to an entire layer of recurrent neurons, at each time step $t$, each neuron receives both the input $x_t$ as well as the entire layer's output $y_{t-1}$ from the previous time step. Figure \ref{fig:nn_recurrent} illustrates the logic behind a recurrent neural network, showing the network unrolled through time.
-\begin{figure}[htbp]
+\begin{figure}[t]
     \centering
     \includegraphics[width=1\textwidth]{nn_recurrent}
     \caption{Logic behind a recurrent neural network}
@@ -428,9 +504,6 @@ Through this process, the LSTM model is able to preserve important information t
 \end{figure}
 \newpage
 
-\subsection{Convolutional neural network}
-
-\lipsum[1-5]
 
 \section{Functional connectivity and graph representation}
 \subsection{Functional connectivity}
