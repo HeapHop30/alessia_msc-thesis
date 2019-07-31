@@ -6,7 +6,11 @@
 
 \paragraph{} \textit{This chapter provides a high-level overview of the work that has been done for this project and the process that has been used.}
 
-\section{Overview of the project steps}
+%------------------------------------------------
+% Overview of the project steps
+%------------------------------------------------
+
+\section{Overview of the project steps} \label{sec: overview_project_steps}
 \paragraph{} The work done for this Master Thesis project can be summarized via a list of steps we've gone through:
 \begin{enumerate}
     \item Definition of the problem to solve;
@@ -23,21 +27,55 @@
 \end{enumerate}
 The following sections will give a short description of what has been done for each project step.
 
-\section{Definition of the problem to solve}
+%------------------------------------------------
+% Definition of the problem to solve
+%------------------------------------------------
+
+\section{Definition of the problem to solve} \label{sec: definition_problem_to_solve}
 \paragraph{} The problem we decided to focus on for this project is the seizure prediction problem, which consists of predicting in advance the happening of an epileptic seizure in a person. The study has been conducted using intracranial electroencephalography data (iEEG) and it is devoted to all the people suffering from drug-resistant epilepsy, which are forced to deal with epileptic seizures in everyday life. With the goal of being able to predict epileptic seizures few seconds in advance, the prediction would allow the neurostimulator to intervene in time on the patient brain in order to block the imminent occurrence of the seizure. The possibility to avoid even only a few of the epileptic seizures of a person would already improve by a lot her living standards.
 
-\section{Research about previous approaches to the problem}
-\paragraph{} Once we identified the objective problem, we spent some time inquiring about previous approaches to the problem. With this aim, we read several scientific papers in order to find out which methods have been already used and the level of performance they obtained. Through this research, we realized how much complex was the problem and how difficult it was to obtain good results, even using deep learning models. We also found out that, in order to have acceptable results, the majority of these models needed to be trained on a large amount of data, which in the case of epileptic seizures is difficult to gather.
+%------------------------------------------------
+% Research about previous approaches to the problem
+%------------------------------------------------
 
-\section{Objective of the project}
-\paragraph{} Having a clearer idea of the problem we were going to face and of its level of complexity, we defined the objective of the project and its boundaries. We decided to conduct a study on different machine learning and deep learning models applied to the problem of seizure prediction, generating a review of models for this problem and looking for the best configuration for each of them. The common thread we set throughout all the models used for this project was the lack of data to train the models. Epileptic seizure data, indeed, are very difficult to gather, so we wanted to find out how well the models would have performed having a very limited amount of data available to learn from.
+\section{Research about previous approaches to the problem} \label{sec: research_about_previous_approaches}
+\paragraph{} Once we identified the objective problem, we spent some time inquiring about previous approaches to the problem. With this aim, we read several scientific papers about seizure prediction in order to find out which methods have been already used and the level of performance they obtained. Through this research, we realized how complex was the problem and how difficult it was to obtain good results, even using powerful deep learning models. We also found out that, in order to have acceptable results, the majority of these models needed to be trained on a large amount of data, which in the case of epileptic seizures is difficult to gather.
 
-\section{Data collection}
-\paragraph{} The data collection was out of our scope, since we were provided directly with ready-to-use data. The data collected for this project arrives from a Toronto hospital and it consist of iEEGs generated from real measurements on a patient suffering from epilepsy. The data, corresponding to 24 hours of monitoring and containing three seizures, have been cleaned and provided to us in order to be used for this project.
+%------------------------------------------------
+% Objective of the project
+%------------------------------------------------
 
-\section{Data analysis and familiarization}
-\section{Technical definition of the problem}
-\section{Choice of the machine learning and deep learning models to use}
+\section{Objective of the project} \label{sec: objective_project}
+\paragraph{} Having a clearer idea of the problem we were going to face and of its level of complexity, we defined the objective of the project and its boundaries. We decided to conduct a study on different machine learning and deep learning models applied to the problem of seizure prediction, generating a review of models to solve this problem and looking for the best configuration for each of them. The common thread we set throughout all the project was the lack of data to train the models. Epileptic seizure data, indeed, are very difficult to gather, so we wanted to find out how well the models would have performed having a very limited amount of data available to learn from.
+
+%------------------------------------------------
+% Data collection
+%------------------------------------------------
+
+\section{Data collection} \label{sec: data_collection}
+\paragraph{} The data collection was out of our scope, since we were provided directly with ready-to-use data. The data collected for this project comes from a Toronto hospital and it consist of iEEGs generated from real measurements on a patient suffering from epilepsy. The data, corresponding to 24 hours of monitoring and containing three seizures, have been cleaned and provided to us in order to be used for this project.
+
+%------------------------------------------------
+% Data analysis and familiarization
+%------------------------------------------------
+
+\section{Data analysis and familiarization} \label{sec: data_analysis_familiarization}
+\paragraph{} After having identified the problem and its difficulties, having defined the boundaries of the project and having retrieved the necessary data, we finally started with the actual implementation of the project. The first phase consisted only in a simple data analysis in order to familiarize with the data. We computed some basic statistical metrics on the iEEGs and we generated some plots of the data to understand it better. In this way, we identified the number of electrodes used for the measurements, the number of epileptic seizures available in the dataset and their duration and, through the plots, we could also visualize the behaviour of brain's electrical signals during the seizures.
+
+%------------------------------------------------
+% Technical definition of the problem
+%------------------------------------------------
+
+\section{Technical definition of the problem} \label{sec: technical_definition_problem}
+\paragraph{} With some knowledge about the data, we could define the problem in a more technical and precise way. The technical definition of the problem has been already provided in Section \ref{sec: problem_definition}, where three cases have been presented: detection on a sample, detection on a sequence and prediction on a sequence respectively. During this project, all the three different cases has been addressed using suitable models depending on the task.
+
+%----------------------------------------------------------------
+% Choice of the machine learning and deep learning models to use
+%----------------------------------------------------------------
+
+\section{Choice of the machine learning and deep learning models to use} \label{sec: choice_models_to_use}
+\paragraph{} gg
+
 \section{Application of the models for the detection task}
 \section{Application of the models for the prediction task}
 \section{Results evaluation}

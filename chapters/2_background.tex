@@ -221,7 +221,7 @@ Figure \ref{fig:dropout} shows and example of dropout applied to a simple dense 
 % Classic machine learning models
 %------------------------------------------------
 
-\section{Classic machine learning models}
+\section{Classic machine learning models} \label{sec: classic_ml_models}
 \paragraph{} Machine learning models are able to perform a specific task efficiently, without the need of explicit instructions, but relying uniquely on the patterns and features they learn from data. Giving the nature of this project's problem and the type of data we are working on, all the models that have been used have been trained in a supervised manner. This means that the training data fed to the algorithm includes the labels, that are the solutions to the problem. In the case of a classification task, the training data consist of both the data features and the respective classes of membership, so that the model can learn from examples and discover patterns that allow it to make good predictions on new data.
 
 In this section we are going to describe the classic machine learning models that have been used, leaving the classic deep learning models (neural networks) for the next section. The models in this section are much weaker than the neural networks, but they are more efficient when the problem is simple enough to be handled by a simpler model.
@@ -312,7 +312,7 @@ The kernel trick can be used together with the soft-margin in order to reach goo
 % Classic deep learning models
 %------------------------------------------------
 
-\section{Classic deep learning models}
+\section{Classic deep learning models} \label{sec: classic_dl_models}
 \paragraph{} Deep learning is a subfield of machine learning that differentiate itself for the specific type of models that it uses in order to learn a certain task. These models are \textit{artificial neural networks}.
 
 Artificial neural networks are very powerful and versatile models that are inspired by human neural networks: the structure of artificial neural networks is comparable to the one of our brain, which has neurons and connection between them to transmit electrical impulses. Similarly, artificial neural networks is composed by several neurons which are the computational cores of the model and which transmit the processed information to each other.
@@ -401,9 +401,6 @@ In a convolutional layer, neurons weights are represented by \textit{filters} (a
 Convolutional layers are usually followed by pooling layers. As already mentioned, the goal of a pooling layer is to subsample the input image in order to reduce its dimensionality; this action has the positive effects of cutting down the computational and memory loads and of reducing the number of parameters, thus diminishing the risk of overfitting. A pooling layer is very similar to a convolutional layer, since it is focused on a receptive field too and it has configurable size, padding and stride. The crucial difference is that a pooling layer doesn't have weights, but instead it aggregate all the information in a receptive field by using an aggregation function (for example the mean or max functions). The pooling layer works on every channel (or feature map) independently, so the output has the same depth as the input.
 
 Through convolutional and pooling layers, a CNN is able to learn high-level features, while reducing the data dimensionality, and to use this information to make predictions through the dense neural network at the end of the architecture.
-
-
-
 
 \subsection{LSTM neural network}
 \paragraph{} LSTM neural networks are a special case of a more general category, which is the recurrent neural networks \cite{OReilly:handsonML}; therefore we are going to first present the basics of recurrent neural networks and then explore LSTM neural networks.
