@@ -83,7 +83,7 @@ The predictions $\hat{y}$ for the binary classifier can be easily obtained by ap
     \hat{y} = \left\{\begin{array}{l}{0 \text { if } \hat{p}<0.5} \\ {1 \text { if } \hat{p} \geq 0.5}\end{array}\right.
 \end{align}
 
-The model parameter $\theta$ is trained in order to estimate high probabilities for positive instances and low probabilities for negative ones. In order to train it, we need a cost function that directs the model on the right track. For logistic regression algorithms, the most suitable cost function is the \textit{log loss}, since it captures exactly the aim of the classifier:
+The model parameter $\theta$ is trained in order to estimate high probabilities for positive instances and low probabilities for negative ones. In order to train it, we need a cost function that directs the model on the right track. For logistic regression algorithms, usually the most suitable cost function is the \textit{log loss}, since it captures exactly the aim of the classifier:
 \begin{align}
     c(\theta) = \left\{\begin{array}{ll}{-\log (\hat{p})} & {\text { if } y=1} \\ {-\log (1-\hat{p})} & {\text { if } y=0}\end{array}\right.
 \end{align}
@@ -103,9 +103,11 @@ The project models make use of the same process, but instead of using such a sim
 \section{Metrics} \label{sec: metrics}
 \paragraph{} In order to evaluate the models, four metrics have been chosen, which are commonly used for binary classifiers: loss, accuracy, ROC-AUC and recall. The first two metrics are the most standard performance measures for all the machine learning models.
 
-\paragraph{Loss} The loss is nothing but the error computed by the cost function in use, which in our case is the log loss.
-
-\todo[inline]{Add description of brier\_score\_loss (used for classic ml models)}
+\paragraph{Loss} The loss is nothing but the error computed by the cost function in use. In our case, we used the log loss (already described in Section \ref{sec: logistic_regression}) for deep learning models and the Brier score loss for classic machine learning models. The Brier score is the mean squared difference (MSE) between the predicted probability and the actual target. The Brier score takes values between 0 and 1 and it suggests whether the predictions are well calibrated. Its formula is:
+\begin{align}
+    \textit{Brier score}=\frac{1}{n} \sum_{i=1}^{n}(\hat{p}_{i} - y_{i})^{2}
+\end{align}
+where $n$ is the number of samples, $\hat{p}_i$ is the predicted probability of sample $i$ and $y_i$ is the target of sample $i$.
 
 \paragraph{Accuracy} The accuracy is simply the ratio of correct prediction, which in a binary classifier is represented by the number of true prediction (true positive and true negative) over the total number of predictions:
 \begin{align}
@@ -172,11 +174,10 @@ The Tanh function is illustrated in Figure \ref{fig:tanh}.
 	\caption{Activation functions}
 \end{figure}
 
-
 \subsection{Optimizers}
 \paragraph{} An optimization algorithm determines the way model's learnable parameters (\textit{weights}) are updated during the training process. The aim of an optimizer is to minimize (or maximize) an objective function that is dependent on the model's weights, which is the cost function. Since the cost function is computed using the model's predictions and the latter are determined by the weights and input features, the weights have a crucial role in minimizing the cost function. The update of the model's learnable parameters takes place through \textit{backpropagation}: after the generation of the predictions, the gradient of the loss function with respect to the weights is computed; then the weights are updated in the opposite direction of the gradient (Gradient Descent). The "magnitude" of the update is given by the \textit{learning rate}, which can be decisive in the search for the loss function's global minimum. The role of an optimizer is to optimize the Gradient Descent process, in order to make it more efficient and effective.
 
-In this project, the optimizer that has been used for all the models is Adam optimizer.
+In this project, the optimizer that has been used for all the models is the Adam optimizer.
 
 \paragraph{Adam optimizer} Adam (Adaptive Moment Estimation) is one of the most popular and used optimizers in deep learning, that usually has good performances. It is based on two intuitions: adaptive learning rate (inspired by RMSProp optimizer) and momentum optimization \cite{arXiv:adam} \cite{arXiv:optimizers}. An adaptive learning rate method computes individual learning rates for different model's learnable parameters; while a momentum method helps accelerating the Gradient Descent process by adding a fraction of the update vector of the past time step to the current update vector. This optimizer stores two moments: the first moment $m_t$ (the mean), which is estimated as the exponentially decaying average of past gradients, and the second moment $v_t$ (the uncentered variance), which is estimated as the exponentially decaying average of past squared gradients. The two moments are computed respectively as follows:
 \begin{align}
@@ -185,8 +186,8 @@ In this project, the optimizer that has been used for all the models is Adam opt
 \end{align}
 where $g_{t}$ is the gradient on current mini-batch and $\beta_1$, $\beta_2$ are optimizer's decay rates, usually set close to 1. Since $m_t$ and $v_t$ are initialized as zero-vectors, they are biased towards zero, therefore they need to be corrected:
 \begin{align}
-    \hat{m}_{t} &=\frac{m_{t}}{1-\beta_{1}^{t}} \\
-    \hat{v}_{t} &=\frac{v_{t}}{1-\beta_{2}^{t}}
+    \hat{m}_{t} =\frac{m_{t}}{1-\beta_{1}^{t}} \qquad\qquad\qquad
+    \hat{v}_{t} =\frac{v_{t}}{1-\beta_{2}^{t}}
 \end{align}
 The first moment $m_t$ is used as momentum optimization parameter, while the second moment $v_t$ is used to adapt the learning rate to each different weight. The resulting Adam update rule for model's weights is the formula:
 \begin{align}
@@ -511,3 +512,5 @@ Through this process, the LSTM model is able to preserve important information t
 \subsection{Edge-conditioned convolution}
 \subsection{Global pooling}
 \subsection{Graph-based LSTM and Convolutional neural networks}
+
+\section{State-of-the-art in seizure prediction}
