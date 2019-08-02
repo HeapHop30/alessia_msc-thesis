@@ -82,32 +82,40 @@ The following sections will give a short description of what has been done for e
 
 \section{Data preprocessing} \label{sec: step_data_preprocessing}
 \paragraph{} The data has been preprocessed in order to be prepared to be used depending on the model and the task concerned. First thing, the dataset has been divided in a training set and a test set: the training set is represented by the data that the model analyzes in order to learn from it and to identify patterns, while the test data is useful to verify how much the trained model can generalize its knowledge to data that it never saw before. Since our dataset contained only three seizures, we used two seizures for the training set and the remaining one for the test set. Because of the lack of data, we couldn't create a validation set, so we mainly used the test set in order to evaluate the models. In the case of deep learning models, the training set has been standardized, since neural networks are very sensible to the numerical range of data features.
-For the detection task on a single time step, no additional operations on data where required, since the dataset was already provided as a big sequence of time step - target couples.
+
+For the detection task on a single time step, no additional operations on data where required, since the dataset was already provided as a big sequence of time step - target couples. For this type of task, indeed, each sample consists of a single time step and the related target needs to be predicted.
+
+For both the detection and prediction tasks on a sequence, on the other hands, sequences needed to be generated. The dataset has been converted in a set of sequences with a single target associated, with temporal relation between time steps inside the same sequence. Depending on whether we were working on detection or on prediction task, the target of each sequence corresponded to the target of the last time step in the sequence, or to the target of a future time step outside the sequence.
+
+For the graph-based models, we transformed the samples from sequences of time steps to sequences of graphs.
+\todo[inline]{Briefly describe how}
+
+In order to have representative results, we performed k-folds cross validation for all the models and the tasks. Cross validation is a useful technique to evaluate machine learning models, especially when there is a limited amount of data at disposal. In order to perform k-folds cross validation, the dataset is divided into $k$ subsets (folds), of which $k-1$ folds are used as training set and the remaining fold as test set. The training-testing process is performed $k$ times, so that each fold is used as test set one time and it is included in the training set all the other times. To perform cross validation with our data, we divided the dataset into three subsets (3-folds cross validation), each one containing one of the three seizures, and we prepared the three corresponding training and test sets, each time using two folds as training set and the remaining fold as test set.
 
 %----------------------------------------------------------------
 % Application of the models for the detection task
 %----------------------------------------------------------------
 
 \section{Application of the models for the detection task} \label{sec: step_models_detection_task}
-\paragraph{} gg
+\paragraph{} gne
 
 %----------------------------------------------------------------
 % Application of the models for the prediction task
 %----------------------------------------------------------------
 
 \section{Application of the models for the prediction task} \label{sec: step_models_prediction_task}
-\paragraph{} gg
+\paragraph{} gne
 
 %----------------------------------------------------------------
 % Results evaluation
 %----------------------------------------------------------------
 
 \section{Results evaluation} \label{sec: step_restults_evaluation}
-\paragraph{} gg
+\paragraph{} gne
 
 %----------------------------------------------------------------
 % Conclusions
 %----------------------------------------------------------------
 
 \section{Conclusions} \label{sec: step_conclusions}
-\paragraph{} gg
+\paragraph{} gne
