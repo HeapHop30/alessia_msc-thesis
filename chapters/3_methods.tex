@@ -97,7 +97,8 @@ In order to have representative results, we performed k-folds cross validation f
 %----------------------------------------------------------------
 
 \section{Application of the models for the detection task} \label{sec: step_models_detection_task}
-\paragraph{} gne
+\paragraph{} The classic machine learning models (Random Forest, Gradient Boosting and Support Vector Machine) and the Dense neural network has been used for the detection task on a single time step; while the other deep learning models (classic and graph-based Convolutional and LSTM neural networks) has been tested on the detection task on a sequence. Several experiments have been carried out in order to look for the best configuration of the models for this type of task. All the models have been evaluated using loss, accuracy, ROC-AUC and recall, trying to find the best trade-off between the four metrics to chose the models configuration that performed the best. The metrics have been computed on 3-fold cross-validation to have more realistic results.
+
 
 %----------------------------------------------------------------
 % Application of the models for the prediction task

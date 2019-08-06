@@ -132,8 +132,7 @@ The false positive rate is the number of negative instances incorrectly classifi
     \label{fig:roc_auc}
 \end{figure}
 
-The ROC curve represents a plot of TPR and FPR at different classification thresholds: if we lower the threshold, the classifier predicts more items as positive, so both TPR and FPR increase. In order to find the best classification threshold, we need to find a tradeoff between TPR and FPR, trying to obtain a higher TPR as possible and a lower FPR as possible (looking at the curve, we need to find the point that is closest to the upper left corner). For this purpose we can rely on the \textit{area under the ROC curve} (AUC), which provides a performance measure for different classification thresholds. The ROC-AUC ranges
-from 0 to 1 and its value represents the quality of the classifier predictions. A perfect classifier has AUC = 1, while a completely random classifier has AUC = 0.5.
+The ROC curve represents a plot of TPR and FPR at different classification thresholds: if we lower the threshold, the classifier predicts more items as positive, so both TPR and FPR increase. In order to find the best classification threshold, we need to find a tradeoff between TPR and FPR, trying to obtain a higher TPR as possible and a lower FPR as possible (looking at the curve, we need to find the point that is closest to the upper left corner). For this purpose we can rely on the \textit{area under the ROC curve} (AUC), which provides a performance measure for different classification thresholds. The ROC-AUC ranges from 0 to 1 and its value represents the quality of the classifier predictions. A perfect classifier has AUC = 1, while a completely random classifier has AUC = 0.5.
 
 %------------------------------------------------
 % Activation, optimization and regularization
