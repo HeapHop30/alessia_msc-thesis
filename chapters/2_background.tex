@@ -46,12 +46,30 @@ The seizure prediction/detection problem can be treated as a classification prob
 
 Let's consider a time portion of $T+1$ discrete time steps in an EEG: the portion will be characterized by a sequence of features $[x_t, x_{t+1}, x_{t+2}, ... , x_{t+T}]$, one for each time step $t$, representing the signals amplitude (measured in volts) in that instant. Let's imagine that the time portion is used to predict a single target $y_{t+k}$, which indicates whether the time step $t+k$ is part of an ongoing epileptic seizure or not. The described situation is illustrated in Figure \ref{fig:problem_def}. Considering this scenario, we can individuate three cases of study of the problem, depending on the value of the variables $T$ and $k$:
 \begin{itemize}
-    \item $T=0,\quad k=0$: in this case, the length of the time portion is equal to $1$ and the target corresponds to label of the single time step in the time portion. So at each time step $x_t$ is associated the target $y_t$ (as in the case described above).\\
+    \item $T=0,\quad k=0$: in this case, the length of the time portion is equal to $1$ and the target corresponds to label of the single time step in the time portion (see Figure \ref{fig:problem_def1}). So at each time step $x_t$ is associated the target $y_t$ (as in the case described above).\\
     \textsc{Example:} \quad$T=0, k=0\quad \Rightarrow{}\quad [x_3] \rightarrow{} y_3$
-    \item $T>0,\quad k=T$: in this case, the length of the time portion is greater that $1$, so a sample consists of a sequence of time steps, and the target is the label associated to the last time step of the sequence. So at each sequence $[x_t, x_{t+1}, ... , x_{t+T}]$ is associated the target $y_{t+T}$.\\
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.8\textwidth]{problem_def1}
+        \caption{Detection on a time step, representing the sample $x_i$ with target $y_i$}
+        \label{fig:problem_def1}
+    \end{figure}
+    \item $T>0,\quad k=T$: in this case, the length of the time portion is greater that $1$, so a sample consists of a sequence of time steps, and the target is the label associated to the last time step of the sequence (see Figure \ref{fig:problem_def2}). So at each sequence $[x_t, x_{t+1}, ... , x_{t+T}]$ is associated the target $y_{t+T}$.\\
     \textsc{Example:} \quad$T=5, k=5\quad \Rightarrow{}\quad [x_0, x_1, ..., x_5] \rightarrow{} y_5$
-    \item $k>T$: in this case, we have a sequence of time steps whose target is associated to a time step that doesn't belong the sequence, but is forwards in time ($t>T+1$). This means that at each sequence $[x_t, x_{t+1}, ... , x_{t+T}]$ is associated the target $y_{t+k}$, where $(t+k) > (t+T)$.\\
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.8\textwidth]{problem_def2}
+        \caption{Detection on a sequence, representing the sample $x_i$ with target $y_i$}
+        \label{fig:problem_def2}
+    \end{figure}
+    \item $k>T$: in this case, we have a sequence of time steps whose target is associated to a time step that doesn't belong the sequence, but is forwards in time ($t>T+1$) (see Figure \ref{fig:problem_def3}). This means that at each sequence $[x_t, x_{t+1}, ... , x_{t+T}]$ is associated the target $y_{t+k}$, where $(t+k) > (t+T)$.\\
     \textsc{Example:} \quad$T=5, k=8\quad \Rightarrow{}\quad [x_0, x_1, ..., x_5] \rightarrow{} y_8$
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.8\textwidth]{problem_def3}
+        \caption{Prediction on a sequence, representing the sample $x_i$ with target $y_i$}
+        \label{fig:problem_def3}
+    \end{figure}
 \end{itemize}
 The first two cases are examples of a detection problem, since the target $y_{t+k}$ to predict is associated to a time step that is still inside the time window we look at to predict it ($k \leq T$). The third case, on the other hand, is a prediction problem, since the target $y_{t+k}$ to predict is associated to a time step that is outside the time window we look at to predict it and it is forwards in time with respect to the time window ($k > T$). The difficulty of the prediction task is that we cannot look at the features $x_t$ in order to predict the target $y_t$, but we have to rely on information from previous time steps (for this reason, we consider $T>0$, since it would be almost impossible to predict the target based on a single time step backwards in time).
 
