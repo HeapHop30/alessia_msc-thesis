@@ -9,11 +9,14 @@
 \renewcommand{\baselinestretch}{1.2}
 \renewcommand*{\bibfont}{\footnotesize} % \small
 \usepackage{graphics}
+\usepackage{graphicx}
+\usepackage{booktabs}
 \usepackage{subcaption}
 \usepackage{float}
 \graphicspath{{images/}}
 \usepackage{enumitem}
 \setlist[1]{itemsep=2pt}
+\usepackage{acronym}
 
 \usepackage{color,soul}
 \usepackage{xcolor,colortbl}
@@ -49,7 +52,6 @@ morecomment=[l]{//s},
 }
 
 
-
 \title{Prediction of Epileptic Seizures\\with Machine Learning and Deep Learning} %compulsory
 % \title{Prediction of Epileptic Seizures\\with Graph-based Deep Learning} %compulsory
 %\subtitle{Subtitle: Reinventing the World} %optional 
@@ -57,7 +59,7 @@ morecomment=[l]{//s},
 \specialization{Artificial Intelligence}%optional
 \begin{committee}
 \advisor{Prof.}{Cesare}{Alippi} %compulsory
-\coadvisor{PhD.}{Daniele}{Grattarola}{} %optional
+\coadvisor{Dr.}{Daniele}{Grattarola}{} %optional
 \end{committee}
 \Day{5th} %compulsory
 \Month{September} %compulsory
@@ -80,9 +82,9 @@ morecomment=[l]{//s},
 % \input{corpus/abstract}\clearpage
 % \input{corpus/acknowledgements}\clearpage
 \tableofcontents
+\input{corpus/acronyms}\clearpage
 % \listoffigures %optional
 % \listoftables %optional
-
 
 %************************************************
 % MAIN SECTION
