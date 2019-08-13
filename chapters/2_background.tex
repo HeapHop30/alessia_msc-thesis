@@ -546,7 +546,7 @@ where $N$ is the number of nodes, $F$ is the number of features for each node an
 
 A variation of the adjacency matrix is the adjacency matrix with inserted self-loops:
 \begin{align*}
-    \tilde{\mathbf{A}} = \mathbf{A} + \mathbf{I}_N
+    \hat{\mathbf{A}} = \mathbf{A} + \mathbf{I}_N
 \end{align*}
 where $\mathbf{I}_N$ is an $N \times N$ identity matrix, that is a square matrix with ones on the main diagonal and zeros elsewhere. Another important matrix representing graphs is the degree matrix $\mathbf{D}$, which is a diagonal matrix where each value of the diagonal is the degree of its corresponding node. The degree is the sum of each row of the adjacency matrix.
 
@@ -558,10 +558,45 @@ Functional connectivity can be expressed as a graph by considering each electrod
     \label{fig:graph_sequence}
 \end{figure}
 
-\section{Graph-based deep learning models}
-\subsection{Graph neural network}
+%--------------------------------------------------
+% Graph-based deep learning models
+%--------------------------------------------------
+
+\section{Graph-based deep learning models} \label{sec: graph_dl}
+\paragraph{} Geometric deep learning stems from the need to apply deep learning models to non-euclidean data. A lot of research on this topic has been conducted during the last decades in order to develop suitable models for this purpose. One of the most common examples of non-euclidean data is the graph data structure, which is able to encode information about the structure and the relation between entities, while still representing individual features. In order to deal with graph data, Graph Neural Networks have been created.
+
+\subsection{Graph neural network and graph convolution} Graph neural networks are deep learning models dedicated to working with graph-structured data. They are able to learn from graph information like structure, relationship, connections and individual features of the entities. Their flexibility opens the door to a wide new range of real-world applications, whose data require to take into account the structural information.
+
+One of the most interesting approach to the application of neural networks to graph is the \textit{graph convolution}, which tries to generalize convolutional layers to arbitrary neighbours. The more standard version of convolutional neural networks, indeed, are generally applied to images, where the neighbourhood is determined by the location of the pixels in a 2D space. However, there are situation in which the spatial information is not available and we have to rely on connection between entities in order to define a neighbourhood (just think of molecules or social networks). This is exactly what graph convolution tries to achieve. In graph convolution, the output of a layer is described by the following equation (expressed in matrix form):
+\begin{align}
+    \mathbf{X}^{(out)}=\phi\left(\tilde{\mathbf{A}} \mathbf{X}^{(in)} \mathbf{W} + \mathbf{b}\right)
+\end{align}
+where $\phi$ is the activation function, $\mathbf{b}$ is the bias, $\mathbf{W}$ is the matrix of model's weights, $\mathbf{X}$ is the node attribute matrix and $\tilde{\mathbf{A}}$ is a modified version of the adjacency matrix that can be computed in different ways. The presence of the adjacency matrix (or some modified version) multiplied to the node features matrix allows the network to filter the features. In this way, the processing of a feature node is influenced only by the neighbourhood's features, determined by the nodes connected to it.
+
+Among the most known geometric deep learning models, there is the Graph Convolutional Network (GCN), from the paper by Kipf and Welling (\cite{arXiv:gcn}). The paper presents a spectral convolutional model applied to graph learning. In a GCN, the output of a layer is defined as:
+\begin{align}
+    \mathbf{X}^{(out)}=\phi\left(\hat{\mathbf{D}}^{-\frac{1}{2}} \hat{\mathbf{A}} \hat{\mathbf{D}}^{-\frac{1}{2}} \mathbf{X}^{(in)} \mathbf{W} + \mathbf{b}\right)
+\end{align}
+so in this case, $\tilde{\mathbf{A}}$ is computed as $\tilde{\mathbf{A}} = \hat{\mathbf{D}}^{-\frac{1}{2}} \hat{\mathbf{A}} \hat{\mathbf{D}}^{-\frac{1}{2}}$. In the equation, $\hat{\mathbf{A}}$ is the adjacency matrix with inserted self-loops, while $\hat{\mathbf{D}}$ is the degree matrix computed from $\hat{\mathbf{A}}$. The $\hat{\mathbf{D}}$ are to the power of $-\frac{1}{2}$ for renormalization reasons.
+
 \subsection{Edge-conditioned convolution}
+\paragraph{} The graph convolution is able to filter the node features based on the adjacency matrix, but it doesn't take into account the edge attributes matrix. The \textit{edge-conditioned convolution} (ECC) address this issue by replacing the model's weights with a neural network that transforms the edge features into convolutional kernels (\cite{arXiv:eccn}). The resulting formula for a single node is:
+\begin{align}
+    \mathbf{X}^{(out)}_i=\phi\left(\frac{1}{\mathcal{N}(i)} \sum_{j \in \mathcal{N}(i)} \mathbf{X}^{(in)}_j f(\mathbf{E}_{ji}) + \mathbf{b}\right)
+\end{align}
+where $\mathcal{N}(i)$ are the one-step neighbourhood of node $i$, $\mathbf{E}$ is the edge attributes matrix and $f(\cdot)$ is a dense neural network that output the convolution kernel as a function of $\mathbf{E}$.
+
 \subsection{Global pooling}
+\paragraph{} Like in standard convolutional neural networks, the convolution on graph is usually followed by a pooling layer to get more general features. The problem with the generalization of local pooling layer is that in graph there is no locality as in images. For this reason, the most common approach is to use a global pooling layer on the graph's node features, which reduces the representation of the graph to a single "virtual" node that summarizes all the features of all the original nodes in the graph. This is usually placed after all the convolutional layer, just before the dense neural network for the final prediction.
+
+A global pooling layer aggregates all the node features through an aggregation function (i.e. mean, sum, max functions). For this project, Global Average Pooling has been used, which is defined as:
+\begin{align}
+    out^{(l)} = \frac{1}{N^{(l)}} \sum_{i=1}^{N^{(l)}} \mathbf{X}^{(l)}_i
+\end{align}
+
+The downside of this approach is that, while summarizing the node features, the global pooling layer isn’t able to preserve the graph’s topological information. In order to take into account also the structure of the graph, hierarchical pooling layers have been proposed lately. They are able to coarsens the graph by dropping some of its nodes based on a measure of the importance of the nodes, thus down-sampling the graph representation.
+
 \subsection{Graph-based LSTM and Convolutional neural networks}
+\paragraph{} For the purpose of this project, graph convolution has been used as a preprocessing tool in order to extract features from the graph data. The graph-conv-pool block, composed by a graph convolutional layer and a global pooling layer, can be followed by any standard neural network, such as dense, convolutional and LSTM neural networks. With this configuration, the role of the graph-conv-pool block is simply to deal with the graph structure of the data and to extract structural features in a form that is processable for standard models.
 
 \section{State-of-the-art in seizure prediction}
