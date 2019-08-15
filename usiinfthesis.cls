@@ -503,7 +503,8 @@ date of the approved research program.\\[18mm]
 
 %%% switch on hyperref support
 \ifthenelse{\boolean{@hypermode}}{%
-\RequirePackage[unicode,plainpages=false,pdfpagelabels,breaklinks]{hyperref}
+\RequirePackage{xcolor,colortbl}
+\RequirePackage[unicode,plainpages=false,pdfpagelabels,breaklinks,linkbordercolor=gray]{hyperref}
 \RequirePackage[all]{hypcap}
 }{}
 
