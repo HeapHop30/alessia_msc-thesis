@@ -4,7 +4,7 @@
 
 \chapter{Background} \label{chap: background}
 
-\paragraph{} \textit{This chapter explains the theory behind the methods and techniques used in this project: it begins by describing the \acs{eeg} data and presenting a formal definition of the problem; later, it presents logistic regression and the related evaluation metrics, followed by the description of activation functions, optimizers and regularizers used in the project; subsequently, it describes the machine learning and deep learning models used and, finally, it presents the the functional connectivity, the graph representation and the graph-based deep learning models.}
+\paragraph{} \textit{This chapter explains the theory behind the methods and techniques used in this project: it begins by describing the \acs{eeg} data and presenting a formal definition of the problem; later, it defines the classification task and the related evaluation metrics; subsequently, it describes the machine learning and deep learning models used and, finally, it presents the the functional connectivity, the graph representation and the graph-based deep learning models.}
 
 %------------------------------------------------
 % Epileptic seizures and EEG
@@ -33,9 +33,9 @@ The \acs{eeg} is a very helpful tool for epilepsy diagnosis, but it can't show f
 %------------------------------------------------
 
 \section{Problem definition} \label{sec: problem_definition}
-\paragraph{} The focus of this thesis is on the seizure prediction problem, but we are going to analyze also the seizure detection task in order to have a clearer and more complete idea of the machine learning models potentialities on epileptic seizures data.
+\paragraph{} The focus of this thesis is on the problem of seizure prediction, of which we are going to analyze three different cases in order to have a clearer and more complete idea of the machine learning models potentialities on epileptic seizures data.
 
-The seizure prediction/detection problem can be treated as a classification problem, whose aim is to predict a class associated with each sample. In the case of an \acs{eeg}, if we consider discrete instants of time (time steps), we can represent the \acs{eeg} information as a matrix $N \times F$, where the rows represent the $N$ electrodes and the columns represent the features associated with the $F$ time steps. So, for each of the $N$ electrodes, we have a sequence of $F$ values representing the amplitude over time. The task can be treated as a classification problem by associating each time step with a label or target, which represents the class of membership between \textit{seizure} and \textit{non-seizure}. This means that each time step is classified based on the presence or absence of an ongoing epileptic seizure in that instant. If we indicate with $x_t$ the set of signals features related to a single time step, we can say that each time step $t$ with features $x_t$ has an associated target $y_t$, which is equal to $1$ if there is an ongoing seizure and to $0$ otherwise. Thus considered, the seizure prediction/detection problem becomes the task of predicting the class target $y_t$ related to the time step's features $x_t$.
+The seizure prediction problem can be treated as a classification problem, whose aim is to predict a class associated with each sample. In the case of an \acs{eeg}, if we consider discrete instants of time (time steps), we can represent the \acs{eeg} information as a matrix $N \times F$, where the rows represent the $N$ electrodes and the columns represent the features associated with the $F$ time steps. So, for each of the $N$ electrodes, we have a sequence of $F$ values representing the amplitude over time. The task can be treated as a classification problem by associating each time step with a label or target, which represents the class of membership between \textit{seizure} and \textit{non-seizure}. This means that each time step is classified based on the presence or absence of an ongoing epileptic seizure in that instant. If we indicate with $x_t$ the set of signals features related to a single time step, we can say that each time step $t$ with features $x_t$ has an associated target $y_t$, which is equal to $1$ if there is an ongoing seizure and to $0$ otherwise. Thus considered, the seizure prediction problem becomes the task of predicting the class target $y_t$ related to the time step's features $x_t$.
 
 \begin{figure}[htbp]
     \centering
@@ -46,7 +46,7 @@ The seizure prediction/detection problem can be treated as a classification prob
 
 Let's consider a time portion of $T+1$ discrete time steps in an \acs{eeg}: the portion will be characterized by a sequence of features $[x_t, x_{t+1}, x_{t+2}, ... , x_{t+T}]$, one for each time step $t$, representing the signals amplitude (measured in volts) in that instant. Let's imagine that the time portion is used to predict a single target $y_{t+k}$, which indicates whether the time step $t+k$ is part of an ongoing epileptic seizure or not. The described situation is illustrated in Figure \ref{fig:problem_def}. Considering this scenario, we can individuate three cases of study of the problem, depending on the value of the variables $T$ and $k$:
 \begin{itemize}
-    \item $T=0,\quad k=0$: in this case, the length of the time portion is equal to $1$ and the target corresponds to label of the single time step in the time portion (see Figure \ref{fig:problem_def1}). So at each time step $x_t$ is associated the target $y_t$ (as in the case described above).\\
+    \item $T=0,\quad k=0$: in this case, the length of the time portion is equal to $1$ and the target corresponds to label of the single time step in the time portion (see Figure \ref{fig:problem_def1}). So at each time step $x_t$ is associated the target $y_t$ (as in the case described above). We can consider this case as a baseline scenario of the prediction problem, that is the detection based on a time step.\\
     \textsc{Example:} \quad$T=0, k=0\quad \Rightarrow{}\quad [x_3] \rightarrow{} y_3$
     \begin{figure}[h]
         \centering
@@ -54,7 +54,7 @@ Let's consider a time portion of $T+1$ discrete time steps in an \acs{eeg}: the 
         \caption{Detection on a time step, representing the sample $x_i$ with target $y_i$}
         \label{fig:problem_def1}
     \end{figure}
-    \item $T>0,\quad k=T$: in this case, the length of the time portion is greater that $1$, so a sample consists of a sequence of time steps, and the target is the label associated to the last time step of the sequence (see Figure \ref{fig:problem_def2}). So at each sequence $[x_t, x_{t+1}, ... , x_{t+T}]$ is associated the target $y_{t+T}$.\\
+    \item $T>0,\quad k=T$: in this case, the length of the time portion is greater that $1$, so a sample consists of a sequence of time steps, and the target is the label associated to the last time step of the sequence (see Figure \ref{fig:problem_def2}). So at each sequence $[x_t, x_{t+1}, ... , x_{t+T}]$ is associated the target $y_{t+T}$. This is still a borderline case of prediction, but with the addition of temporal dependencies between time steps, that is the detection based on a sequence of time steps.\\
     \textsc{Example:} \quad$T=5, k=5\quad \Rightarrow{}\quad [x_0, x_1, ..., x_5] \rightarrow{} y_5$
     \begin{figure}[h]
         \centering
@@ -62,7 +62,7 @@ Let's consider a time portion of $T+1$ discrete time steps in an \acs{eeg}: the 
         \caption{Detection on a sequence, representing the sample $x_i$ with target $y_i$}
         \label{fig:problem_def2}
     \end{figure}
-    \item $k>T$: in this case, we have a sequence of time steps whose target is associated to a time step that doesn't belong the sequence, but is forwards in time ($t>T+1$) (see Figure \ref{fig:problem_def3}). This means that at each sequence $[x_t, x_{t+1}, ... , x_{t+T}]$ is associated the target $y_{t+k}$, where $(t+k) > (t+T)$.\\
+    \item $k>T$: in this case, we have a sequence of time steps whose target is associated to a time step that doesn't belong the sequence, but is forwards in time ($t>T+1$) (see Figure \ref{fig:problem_def3}). This means that at each sequence $[x_t, x_{t+1}, ... , x_{t+T}]$ is associated the target $y_{t+k}$, where $(t+k) > (t+T)$. This is the real prediction problem, since temporal dependencies are used to predict a time step some time in the future, so we are dealing with the prediction based on a sequence of time steps.\\
     \textsc{Example:} \quad$T=5, k=8\quad \Rightarrow{}\quad [x_0, x_1, ..., x_5] \rightarrow{} y_8$
     \begin{figure}[h]
         \centering
@@ -71,14 +71,18 @@ Let's consider a time portion of $T+1$ discrete time steps in an \acs{eeg}: the 
         \label{fig:problem_def3}
     \end{figure}
 \end{itemize}
-The first two cases are examples of a detection problem, since the target $y_{t+k}$ to predict is associated to a time step that is still inside the time window we look at to predict it ($k \leq T$). The third case, on the other hand, is a prediction problem, since the target $y_{t+k}$ to predict is associated to a time step that is outside the time window we look at to predict it and it is forwards in time with respect to the time window ($k > T$). The difficulty of the prediction task is that we cannot look at the features $x_t$ in order to predict the target $y_t$, but we have to rely on information from previous time steps.
+The first two cases are examples of borderline cases of the prediction problem, that we define detection, since the target $y_{t+k}$ to predict is associated to a time step that is still inside the time window we look at to predict it ($k \leq T$). The third case, on the other hand, is a genuine prediction problem, since the target $y_{t+k}$ to predict is associated to a time step that is outside the time window we look at to predict it and it is forwards in time with respect to the time window ($k > T$). The difficulty of this last case is that we cannot look at the features $x_t$ in order to predict the target $y_t$, but we have to rely on information from previous time steps.
 
 %------------------------------------------------
-% Logistic Regression
+% Classification
 %------------------------------------------------
 
-\section{Logistic Regression} \label{sec: logistic_regression}
-\paragraph{} In this project, the binary classification problem related to epileptic seizure detection/prediction is approached using logistic regression. The logistic regression algorithm is used to estimate the probability that an instance belongs to a particular class \cite{OReilly:handsonML}. If the estimated probability is greater than a fixed threshold, which is commonly set to $0.5$, then the model assigns the instance to the positive class (in our case, \textit{seizure} class), otherwise it assigns the instance to the negative class (in our case, \textit{non-seizure}). In this way, logistic regression can be used as a binary classifier.
+\section{Classification} \label{sec: classification}
+\paragraph{} The problem of epileptic seizure prediction can be identified as a classification task. Classification is the process of predicting the target associated with each sample in the data. In other words, the classification task consists in finding a mapping function from the input sample's features to the discrete output targets. This task is usually associated to data that can be assigned to a certain number of categories, which correspond to the targets to predict. When the data needs to be assigned to only two categories, we talk about binary classification. In this project, the problem of epileptic seizure (as described in Section \ref{sec: problem_definition}) can be considered a binary classification task, since we want to classify the time steps in two classes, which are the \textit{seizure} class and the \textit{non-seizure} class.
+
+One of the most common methods to solve a binary classification task is logistic regression. Since the majority of models used in this project rely on logistic regression, we are going to use it as an example in order to provide a more complete description of the classification problem.
+
+The logistic regression algorithm is used to estimate the probability that an instance belongs to a particular class \cite{OReilly:handsonML}. If the estimated probability is greater than a fixed threshold, which is commonly set to $0.5$, then the model assigns the instance to the positive class (in our case, \textit{seizure} class), otherwise it assigns the instance to the negative class (in our case, \textit{non-seizure} class). In this way, logistic regression can be used as a binary classifier.
 
 Let's look at a very simple logistic regression model as an example: it computes the weighted sum of the input features $\mathbf{x}$ multiplied to the model parameter $\theta$ and it outputs the logistic of the result:
 \begin{align}
@@ -121,7 +125,7 @@ The algorithms that we studied in this work leverage this learning process, but 
 \section{Metrics} \label{sec: metrics}
 \paragraph{} In order to evaluate the models, four metrics have been chosen, which are commonly used for binary classifiers: loss, accuracy, ROC-AUC and recall. The first two metrics are the most common performance measures for all the machine learning models.
 
-\paragraph{Loss} The loss is the cost function evaluated on a particular set of data. In our case, we used the log loss (already described in Section \ref{sec: logistic_regression}) for deep learning models and the mean squared error (\acs{mse}) loss for classic machine learning models as cost functions. The \acs{mse} loss, also called Brier score, is the mean squared difference between the predicted probability and the actual target. The \acs{mse} loss takes values between 0 and 1 and it suggests whether the predictions are well calibrated. Its formula is:
+\paragraph{Loss} The loss is the cost function evaluated on a particular set of data. In our case, we used the log loss (already described in Section \ref{sec: classification}) for deep learning models and the mean squared error (\acs{mse}) loss for classic machine learning models as cost functions. The \acs{mse} loss, also called Brier score, is the mean squared difference between the predicted probability and the actual target. The \acs{mse} loss takes values between 0 and 1 and it suggests whether the predictions are well calibrated. Its formula is:
 \begin{align}
     \textit{MSE loss}=\frac{1}{n} \sum_{i=1}^{n}(\hat{p}_{i} - y_{i})^{2}
 \end{align}
@@ -151,89 +155,6 @@ The false positive rate is the number of negative instances incorrectly classifi
 \end{figure}
 
 The \acs{roc} curve represents a plot of TPR and FPR at different classification thresholds: if we lower the threshold, the classifier predicts more items as positive, so both TPR and FPR increase. In order to find the best classification threshold, we need to find a tradeoff between TPR and FPR, trying to obtain a higher TPR as possible and a lower FPR as possible (looking at the curve, we need to find the point that is closest to the upper left corner). For this purpose we can rely on the \textit{area under the \acs{roc} curve} (\acs{auc}), which provides a performance measure for different classification thresholds. The ROC-AUC ranges from 0 to 1 and its value represents the quality of the classifier predictions. A perfect classifier has \acs{auc} = 1, while a completely random classifier has \acs{auc} = 0.5.
-
-%------------------------------------------------
-% Activation, optimization and regularization
-%------------------------------------------------
-
-\section{Activation, optimization and regularization} \label{sec: activation_optimization_regularization}
-\paragraph{} This section describes topics that are related only to the deep learning models.
-
-\subsection{Activation functions}
-An activation function is a non-linear mapping between the input and the output. Activation functions are essential in neural networks layers, since they introduce the non-linearity properties to the model: without activation functions, the neural network would be a simple linear transformation and it wouldn't be able to learn from complex data.
-
-Some activation functions are more suited to hidden layers, while others are perfect to compute the final output of the model. In this project, we used the sigmoid function as activation function for the last layer of our models in order to classify data, as previously explained in Section \ref{sec: logistic_regression}. For the hidden layers, we used both \acf{relu} and \acf{tanh} activation functions.
-
-\paragraph{ReLU} \acs{relu} is a very popular and extremely fast and effective activation function for hidden layers. Its principle is very simple: it keeps only positive values, while setting to 0 all the negative ones.
-\begin{align}
-    \text{R}(x) = max(0, x)
-\end{align}
-The \acs{relu} function is illustrated in Figure \ref{fig:relu}. The \acs{relu} activation function is very effective for very deep networks, since it helps avoiding the vanishing gradient problem. This problem arises when the gradient of the loss function, used to update the model's weights, assumes too small values during the backpropagation across the layers and the network is not able to learn anymore. \acs{relu}, thanks to the sparsity of its outputs, helps avoiding this problem.
-
-\paragraph{Tanh} \acs{tanh} is similar to sigmoid, but it ranges from $-1$ to $1$. It maps negative input as strongly negative, positive ones as strongly positive and zero inputs near zero. Its formula is:
-\begin{align}
-    \tanh{(x)} = \frac{e^{2x} - 1}{e^{2x} + 1}
-\end{align}
-The \acs{tanh} function is illustrated in Figure \ref{fig:tanh}.
-\begin{figure}[htbp]
-    \centering
-    \begin{subfigure}[t]{0.5\textwidth}
-		\includegraphics[width=0.9\textwidth]{relu}
-        \caption{ReLU activation function (from \textit{Medium})}
-        \label{fig:relu}
-	\end{subfigure}%
-	~
-	\begin{subfigure}[t]{0.5\textwidth}
-		\includegraphics[width=1\textwidth]{tanh}
-        \caption{Tanh activation function (from \textit{Wolfram MathWorld})}
-        \label{fig:tanh}
-	\end{subfigure}
-	\caption{Activation functions}
-\end{figure}
-
-\subsection{Optimizers}
-\paragraph{} An optimization algorithm determines the way in which the model's parameters (\textit{weights}) are updated during the training process. The aim of an optimizer is to minimize an objective function that is dependent on the model's weights, which is the cost function. Since the cost function is computed using the model's predictions and the latter are determined by the weights and input features, the weights have a crucial role in minimizing the cost function. The update of the model's learnable parameters takes place through \textit{backpropagation}: after the generation of the predictions, the gradient of the loss function with respect to the weights is computed; then the weights are updated in the opposite direction of the gradient (Gradient Descent). The "magnitude" of the update is given by the \textit{learning rate}, which can be decisive in the search for the loss function's global minimum. The role of an optimizer is to optimize the Gradient Descent process, in order to make it more efficient and effective.
-
-In this project, the optimizer that has been used for all the models is the \acf{adam} optimizer.
-
-\paragraph{\acs{adam} optimizer} \acs{adam} is one of the most popular and used optimizers in deep learning, that usually has good performances. It is based on two intuitions: adaptive learning rate (inspired by RMSProp optimizer) and momentum optimization \cite{arXiv:adam} \cite{arXiv:optimizers}. An adaptive learning rate method computes individual learning rates for different model's learnable parameters; while a momentum method helps accelerating the Gradient Descent process by adding a fraction of the update vector of the past time step to the current update vector. This optimizer stores two moments: the first moment $m_t$ (the mean), which is estimated as the exponentially decaying average of past gradients, and the second moment $v_t$ (the uncentered variance), which is estimated as the exponentially decaying average of past squared gradients. The two moments are computed respectively as follows:
-\begin{align}
-    m_{t} &=\beta_{1} m_{t-1}+\left(1-\beta_{1}\right) g_{t} \\
-    v_{t} &=\beta_{2} v_{t-1}+\left(1-\beta_{2}\right) g_{t}^{2}
-\end{align}
-where $g_{t}$ is the gradient on current mini-batch and $\beta_1$, $\beta_2$ are optimizer's decay rates, usually set close to 1. Since $m_t$ and $v_t$ are initialized as zero-vectors, they are biased towards zero, therefore they need to be corrected:
-\begin{align}
-    \hat{m}_{t} =\frac{m_{t}}{1-\beta_{1}^{t}} \qquad\qquad\qquad
-    \hat{v}_{t} =\frac{v_{t}}{1-\beta_{2}^{t}}
-\end{align}
-The first moment $m_t$ is used as momentum optimization parameter, while the second moment $v_t$ is used to adapt the learning rate to each different weight. The resulting \acs{adam} update rule for model's weights is the formula:
-\begin{align}
-    \theta_{t+1}=\theta_{t}-\frac{\eta}{\sqrt{\hat{v}_{t}}+\epsilon} \hat{m}_{t}
-\end{align}
-where $\theta$ is the model weight and $\eta$ is the learning rate ($\epsilon$ is just a smoothing term usually initialized to a tiny number).
-
-\subsection{Regularization}
-\paragraph{} Regularization techniques are very useful in deep learning in order to avoid overfitting. Deep neural networks generally have a huge amount of parameters, which represent their power to learn from complex datasets; this flexibility, however, sometimes leads to the overfitting of the training set, preventing the model from making good predictions on any other dataset \cite{OReilly:handsonML}. To solve this problem, there exist several regularization methods, which in some way limit the amount of freedom of the model by encouraging the optimization process to find simpler solutions.
-
-The regularization techniques used in this project are the $\ell_{2}$ regularization and dropout.
-
-\paragraph{$\mathbf{\ell_2}$ regularization} The $\ell_2$ regularization, also called Ridge Regression or Tikhonov regularization, constrains the model's flexibility by adding a regularization term to the cost function. In this way, while trying to fit the data, the model is forced to keep the weights as small as possible. The regularization term added to the loss function is the 2-norm (Euclidean distance) squared, controlled by the parameter $\lambda$, which handles the amount of regularization of the model. This is expressed by the equation:
-\begin{align}
-    &\textit{regularization term } = \lambda \|\theta\|_{2}^{2} = 
-    \lambda \sum_{i=1}^{m} \theta_{i}^{2}\\
-    &\textit{error } = (\textit{loss function}) + \lambda \sum_{i=1}^{m} \theta_{i}^{2}
-\end{align}
-where $\|\cdot\|_{2}$ represents the 2-norm and $m$ is the length of the weights vector $\theta$ of the model. If $\lambda = 0$, then there is no regularization, since the regularization term added to the loss function is zero. If $\lambda$ is too large, then the weights take a value very close to zero and the model underfits the data, not being able to learn from it.
-
-\paragraph{Dropout} Dropout is probably the most popular regularization technique in deep learning. The principle is very simple: during the training process, some layer's neurons are "dropped out", which means they are set to zero and completely ignored. The neurons to shut down are selected from each layer based on a probability $p$. This means that, at each training step, each neuron has a probability $p$ of being shut down for that training step. The probability $p$ represents the dropout rate, that is the fraction of nodes to ignore.
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.7\textwidth]{dropout}
-    \caption{Illustrated example of dropout (from \textit{Srivastava, Nitish, et al. ”Dropout: a simple way to prevent neural networks from overfitting”, JMLR 2014})}
-    \label{fig:dropout}
-\end{figure}
-
-Figure \ref{fig:dropout} shows and example of dropout applied to a simple dense neural network. The idea behind dropout is that the network cannot rely on the features of each individual neuron, because if an essential neuron is shut down, then the network is not able to perform well. By ignoring some percentage of different neurons at each training step, the model is forced to learn more robust features, that work well together with the features of other groups of neurons. This approach prevents co-adaption, which is a situation that arises when some neurons are highly dependant on others. Dropout forces each single neuron to learn informative features, different from the ones learned by other neurons. In this way, a neuron is not dependant on the features of few individual neurons, leading to a better generalization.
 
 %------------------------------------------------
 % Classic machine learning models
@@ -331,9 +252,11 @@ The kernel trick can be used together with the soft-margin in order to reach goo
 %------------------------------------------------
 
 \section{Deep learning models} \label{sec: dl_models}
-\paragraph{} Deep learning is a subfield of machine learning that differentiate itself for the specific type of models that it uses in order to learn a certain task. These models are \textit{artificial neural networks}.
+\paragraph{} Deep learning is a subfield of machine learning that differentiate itself for the specific type of models that it uses in order to learn a certain task. Deep learning models use a hierarchical representation of the features in order to make predictions \cite{Nvidia:dl}. Like other machine learning algorithms, deep learning models automatically extract common patterns found in the data, which become the crucial features to be used in the classification or regression process. The difference with standard machine learning methods is in the way the features are gathered. Deep learning models organize the feature identification in a hierarchical way, by extracting multiple layers of non-linear features to be used for making predictions. The \textit{deep} hierarchy of non-linear features allows the model to learn more complex features with respect to standard machine learning algorithms. The most common deep learning models, which make use of a hierarchical representation of the features, are \textit{artificial neural networks}.
 
-Artificial neural networks, or simply neural networks (\acsp{nn}), are very powerful and versatile models that are inspired by human neural networks: the structure of artificial neural networks is comparable to the one of our brain, which has neurons and connection between them to transmit electrical impulses. Similarly, artificial neural networks are composed by several neurons which are the computational cores of the model and which transmit the processed information to each other.
+
+\subsection{Artificial neural networks}
+\paragraph{} Artificial neural networks, or simply neural networks (\acsp{nn}), are very powerful and versatile models that are inspired by human neural networks: the structure of artificial neural networks is comparable to the one of our brain, which has neurons and connection between them to transmit electrical impulses. Similarly, artificial neural networks are composed by several neurons which are the computational cores of the model and which transmit the processed information to each other.
 
 Neural networks organize the neurons in layers: the input layer is represented by the input data, the output layer is the last one that process data and returns the result of the entire model, while all the layers in between are called \textit{hidden layers} and, in addition to transforming the data, they send the processed information to the next layer. Figure \ref{fig:nn_layers} shows an example of a typical network's structure.
 \begin{figure}[htbp]
@@ -342,23 +265,8 @@ Neural networks organize the neurons in layers: the input layer is represented b
     \caption{Neural network's structure and layers (from \textit{Neural Networks and Deep Learning} free online book)}
     \label{fig:nn_layers}
 \end{figure}
-Each neuron processes the input data by computing a linear transformation, that is the weighted sum $\sum$ plus a bias, followed by a non-linear transformation, that is the activation function $\sigma$. The weighted sum is performed by multiplying each input feature $x_i$ for its corespondent weight $w_i$ and then taking the sum of all the resulting products. A bias term $b = 1$ is added to the weighted sum to help the network approximating the objective function. The result of this linear transformation represents the input of the activation function, which, as already mentioned, introduces the non-linearity properties by mapping the data to the desired output. Figure \ref{fig:nn_neuron} illustrates the functioning of a single neuron. 
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.6\textwidth]{nn_neuron}
-    \caption{Illustrated description of the functioning of a single neuron}
-    \label{fig:nn_neuron}
-\end{figure}
-Each neuron in a layer performs these operation and the outputs of all the neurons of that layer will be the inputs for the next layer. Formally, the inputs and outputs of layers of a neural network can be described by the equations:
-\begin{align}
-    &h^{\textit{out}}_{0} = \mathbf{X}\qquad\qquad\qquad \text{(input layer)}\\
-    &h^{\textit{in}}_{i} = h^{\textit{out}}_{i-1} \times \mathbf{W}_i + \mathbf{B}_i\\
-    &h^{\textit{out}}_{i} = \phi_i (h^{\textit{in}}_{i})
-\end{align}
-where $\mathbf{X}$ is the features matrix of input data, $\mathbf{W}_i$ is the weights matrix of layer $i$, $\mathbf{B}_i$ is the bias vector of layer $i$, $\phi_i$ is the activation function used by neurons of layer $i$, and the operator $\times$ represents matrix multiplication.
 
-\subsection{Dense neural network}
-\paragraph{} A dense neural network (or fully-connected neural network) is a network that consists of a sequence of fully-connected layers \cite{OReilly:TFforDL}. Each layer represents a function (linear and non-linear transformations) from $\mathbb{R}^F$ to $\mathbb{R}^{F_m}$. This means that, for each input instance having $F$ features, the corresponding output will have dimensionality $F_m$, where $F_m$ is the number of neurons in the network's output layer (the $m$-th layer). Even for the hidden layers, the output dimension depends on the number of neurons present in the layer.
+The most classic form of neural networks is the \textit{feed-forward neural network} \acs{fcnn}, also called dense neural network. A \acs{fcnn} consists of a sequence of fully-connected layers \cite{OReilly:TFforDL}. Each layer represents a function (linear and non-linear transformations) from $\mathbb{R}^F$ to $\mathbb{R}^{F_m}$. This means that, for each input instance having $F$ features, the corresponding output will have dimensionality $F_m$, where $F_m$ is the number of neurons in the network's output layer (the $m$-th layer). Even for the hidden layers, the output dimension depends on the number of neurons present in the layer.
 
 The network is called \textit{fully-connected} because the output of each neuron in one layer is sent as input of each neuron in the next layer, so there is a direct connection between all the neurons belonging to subsequent layers. Figure \ref{fig:nn_dense} shows and example of dense neural network, making visible the full interconnection between subsequent layers.
 \begin{figure}[htbp]
@@ -368,13 +276,113 @@ The network is called \textit{fully-connected} because the output of each neuron
     \label{fig:nn_dense}
 \end{figure}
 
-For each training input instance, the model computes the output of every neuron in each consecutive layer until it reaches the final predictions from the output layer (\textit{forward pass)}. After that, it compares its prediction with the actual targets and measures the output error. The error is then propagated through each layer in reverse in order to compute the error contribution (error gradient) from each neuron's connection, until it reaches the input layer (\textit{backward pass}). The error is then used by the optimizer to update the connections weights and allow the model to learn. Dense neural networks are included in the category of feed-forward neural networks, since the activation flows only in one direction.
+Each neuron processes the input data by computing the following transformation:
+\begin{align}
+    \mathbf{x}_{i}^{l}=\sigma\left(\sum_{j} \mathbf{w}_{ij}^{l} \mathbf{x}_{j}^{l-1} + \mathbf{b}_{i}^{l}\right)
+\end{align}
+where the subscript represent the $i^{th}$ or $j^{th}$ neuron of the layer in the superscript, which is the $l^{th}$ or $(l-1)^{th}$ layer, $\mathbf{x}$ represents the input features, $\mathbf{w}$ represents the correspondent weights, $\mathbf{b}$ represents the bias term, usually equal to 1, and $\sigma$ represents the activation function. The weighted sum plus the bias term form the linear part of the transformation, followed by the non-linear part, which is the application of the activation function. The bias term helps the network approximating the objective function; while the activation function, as already mentioned, introduces the non-linearity properties by mapping the data to the desired output. Figure \ref{fig:nn_neuron} illustrates the functioning of a single neuron.
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.6\textwidth]{nn_neuron}
+    \caption{Illustrated description of the functioning of a single neuron}
+    \label{fig:nn_neuron}
+\end{figure}
 
-When used for classification tasks, the output layer of a dense neural network has a number of neurons that is equal to the number of classes of the data. In this way, each output of the network (computed through softmax or sigmoid activation function) corresponds to the estimated probability that the input instance belongs to the corresponding class. The instance is then assigned to the class which obtained higher probability.
+Each neuron in a layer performs this operation and the outputs of all the neurons of that layer will be the inputs for the next layer. Formally, the inputs and outputs of layers of a neural network can be described by the equations:
+\begin{align}
+    &h^{\textit{out}}_{0} = \mathbf{X}\qquad\qquad\qquad \text{(input layer)}\\
+    &h^{\textit{in}}_{i} = h^{\textit{out}}_{i-1} \times \mathbf{W}_i + \mathbf{B}_i\\
+    &h^{\textit{out}}_{i} = \phi_i (h^{\textit{in}}_{i})
+\end{align}
+where $\mathbf{X}$ is the features matrix of input data, $\mathbf{W}_i$ is the weights matrix of layer $i$, $\mathbf{B}_i$ is the bias vector of layer $i$, $\phi_i$ is the activation function used by neurons of layer $i$, and the operator $\times$ represents matrix multiplication.
+
+When used for classification tasks, the output layer of a \acs{fcnn} has a number of neurons that is equal to the number of classes of the data. In this way, each output of the network (computed through softmax or sigmoid activation function) corresponds to the estimated probability that the input instance belongs to the corresponding class. The instance is then assigned to the class which obtained higher probability.
+
+\subsection{Neural network's training process}
+\paragraph{} The training process of neural networks takes places through two steps: the forward and backward propagations. For each training input instance, the model computes the output of every neuron in each consecutive layer until it reaches the final predictions from the output layer (\textit{forward pass)}. After that, it compares its prediction with the actual targets and measures the output error. The error is then propagated through each layer in reverse in order to compute the error contribution (error gradient) from each neuron's connection, until it reaches the input layer (\textit{backward pass}). The error is then used by the optimizer to update the connections weights and allow the model to learn. The neural networks in which the activation flows only in one direction are included in the category of feed-forward neural networks.
+
+The \textit{backpropagation} represents the core of the learning process of a neural network, since it is the procedure to update the model's learnable parameters. After the generation of the predictions (forward pass), the gradient of the loss function with respect to the weights is computed; then the weights are updated in the opposite direction of the gradient. This operation is called \textit{Gradient Descent}. The "magnitude" of the update is given by the \textit{learning rate}, which can be decisive in the search for the loss function's global minimum.
+
+
+\subsection{Optimizers}
+\paragraph{} An optimization algorithm determines the way in which the model's parameters (\textit{weights}) are updated during the training process. The aim of an optimizer is to minimize an objective function that is dependent on the model's weights, which is the cost function. Since the cost function is computed using the model's predictions and the latter are determined by the weights and input features, the weights have a crucial role in minimizing the cost function. Since the weights values are determined by the Gradient Descent, the role of an optimizer is to optimize the Gradient Descent process, in order to make it more efficient and effective. In this project, the optimizer that has been used for all the models is the \acf{adam} optimizer.
+
+\paragraph{\acs{adam} optimizer} \acs{adam} is one of the most popular and used optimizers in deep learning, that usually has good performances. It is based on two intuitions: adaptive learning rate (inspired by RMSProp optimizer) and momentum optimization \cite{arXiv:adam} \cite{arXiv:optimizers}. An adaptive learning rate method computes individual learning rates for different model's learnable parameters; while a momentum method helps accelerating the Gradient Descent process by adding a fraction of the update vector of the past time step to the current update vector. This optimizer stores two moments: the first moment $m_t$ (the mean), which is estimated as the exponentially decaying average of past gradients, and the second moment $v_t$ (the uncentered variance), which is estimated as the exponentially decaying average of past squared gradients. The two moments are computed respectively as follows:
+\begin{align}
+    m_{t} &=\beta_{1} m_{t-1}+\left(1-\beta_{1}\right) g_{t} \\
+    v_{t} &=\beta_{2} v_{t-1}+\left(1-\beta_{2}\right) g_{t}^{2}
+\end{align}
+where $g_{t}$ is the gradient on current mini-batch and $\beta_1$, $\beta_2$ are optimizer's decay rates, usually set close to 1. Since $m_t$ and $v_t$ are initialized as zero-vectors, they are biased towards zero, therefore they need to be corrected:
+\begin{align}
+    \hat{m}_{t} =\frac{m_{t}}{1-\beta_{1}^{t}} \qquad\qquad\qquad
+    \hat{v}_{t} =\frac{v_{t}}{1-\beta_{2}^{t}}
+\end{align}
+The first moment $m_t$ is used as momentum optimization parameter, while the second moment $v_t$ is used to adapt the learning rate to each different weight. The resulting \acs{adam} update rule for model's weights is the formula:
+\begin{align}
+    \theta_{t+1}=\theta_{t}-\frac{\eta}{\sqrt{\hat{v}_{t}}+\epsilon} \hat{m}_{t}
+\end{align}
+where $\theta$ is the model weight and $\eta$ is the learning rate ($\epsilon$ is just a smoothing term usually initialized to a tiny number).
+
+
+\subsection{Activation functions}
+An activation function is a non-linear mapping between the input and the output. Activation functions are essential in neural networks layers, since they introduce the non-linearity properties to the model: without activation functions, the neural network would be a simple linear transformation and it wouldn't be able to learn from complex data.
+
+Some activation functions are more suited to hidden layers, while others are perfect to compute the final output of the model. In this project, we used the sigmoid function as activation function for the last layer of our models in order to classify data, as previously explained in Section \ref{sec: classification}. For the hidden layers, we used both \acf{relu} and \acf{tanh} activation functions.
+
+\paragraph{ReLU} \acs{relu} is a very popular and extremely fast and effective activation function for hidden layers. Its principle is very simple: it keeps only positive values, while setting to 0 all the negative ones.
+\begin{align}
+    \text{R}(x) = max(0, x)
+\end{align}
+The \acs{relu} function is illustrated in Figure \ref{fig:relu}. The \acs{relu} activation function is very effective for very deep networks, since it helps avoiding the vanishing gradient problem. This problem arises when the gradient of the loss function, used to update the model's weights, assumes too small values during the backpropagation across the layers and the network is not able to learn anymore. \acs{relu}, thanks to the sparsity of its outputs, helps avoiding this problem.
+
+\paragraph{Tanh} \acs{tanh} is similar to sigmoid, but it ranges from $-1$ to $1$. It maps negative input as strongly negative, positive ones as strongly positive and zero inputs near zero. Its formula is:
+\begin{align}
+    \tanh{(x)} = \frac{e^{2x} - 1}{e^{2x} + 1}
+\end{align}
+The \acs{tanh} function is illustrated in Figure \ref{fig:tanh}.
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[t]{0.5\textwidth}
+		\includegraphics[width=0.9\textwidth]{relu}
+        \caption{ReLU activation function (from \textit{Medium})}
+        \label{fig:relu}
+	\end{subfigure}%
+	~
+	\begin{subfigure}[t]{0.5\textwidth}
+		\includegraphics[width=1\textwidth]{tanh}
+        \caption{Tanh activation function (from \textit{Wolfram MathWorld})}
+        \label{fig:tanh}
+	\end{subfigure}
+	\caption{Activation functions}
+\end{figure}
+
+
+\subsection{Regularization}
+\paragraph{} Regularization techniques are very useful in deep learning in order to avoid overfitting. Deep neural networks generally have a huge amount of parameters, which represent their power to learn from complex datasets; this flexibility, however, sometimes leads to the overfitting of the training set, preventing the model from making good predictions on any other dataset \cite{OReilly:handsonML}. To solve this problem, there exist several regularization methods, which in some way limit the amount of freedom of the model by encouraging the optimization process to find simpler solutions.
+
+The regularization techniques used in this project are the $\ell_{2}$ regularization and dropout.
+
+\paragraph{$\mathbf{\ell_2}$ regularization} The $\ell_2$ regularization, also called Ridge Regression or Tikhonov regularization, constrains the model's flexibility by adding a regularization term to the cost function. In this way, while trying to fit the data, the model is forced to keep the weights as small as possible. The regularization term added to the loss function is the 2-norm (Euclidean distance) squared, controlled by the parameter $\lambda$, which handles the amount of regularization of the model. This is expressed by the equation:
+\begin{align}
+    &\textit{regularization term } = \lambda \|\theta\|_{2}^{2} = 
+    \lambda \sum_{i=1}^{m} \theta_{i}^{2}\\
+    &\textit{error } = (\textit{loss function}) + \lambda \sum_{i=1}^{m} \theta_{i}^{2}
+\end{align}
+where $\|\cdot\|_{2}$ represents the 2-norm and $m$ is the length of the weights vector $\theta$ of the model. If $\lambda = 0$, then there is no regularization, since the regularization term added to the loss function is zero. If $\lambda$ is too large, then the weights take a value very close to zero and the model underfits the data, not being able to learn from it.
+
+\paragraph{Dropout} Dropout is probably the most popular regularization technique in deep learning. The principle is very simple: during the training process, some layer's neurons are "dropped out", which means they are set to zero and completely ignored. The neurons to shut down are selected from each layer based on a probability $p$. This means that, at each training step, each neuron has a probability $p$ of being shut down for that training step. The probability $p$ represents the dropout rate, that is the fraction of nodes to ignore.
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.7\textwidth]{dropout}
+    \caption{Illustrated example of dropout (from \textit{Srivastava, Nitish, et al. ”Dropout: a simple way to prevent neural networks from overfitting”, JMLR 2014})}
+    \label{fig:dropout}
+\end{figure}
+
+Figure \ref{fig:dropout} shows and example of dropout applied to a simple dense neural network. The idea behind dropout is that the network cannot rely on the features of each individual neuron, because if an essential neuron is shut down, then the network is not able to perform well. By ignoring some percentage of different neurons at each training step, the model is forced to learn more robust features, that work well together with the features of other groups of neurons. This approach prevents co-adaption, which is a situation that arises when some neurons are highly dependant on others. Dropout forces each single neuron to learn informative features, different from the ones learned by other neurons. In this way, a neuron is not dependant on the features of few individual neurons, leading to a better generalization.
 
 
 \subsection{Convolutional neural network}
-\paragraph{} Convolutional neural networks (\acs{cnns}) are feed-forward networks that work very well especially for image recognition and complex visual tasks in general \cite{OReilly:handsonML}. A typical \acs{cnn} architecture consists of different building blocks: the convolutional layers, which identify low-level features in the image and learn to assemble them into higher-level features; the pooling layers, which subsample the image in order to reduce its dimensionality; finally, the dense network, which is at the end of the architecture and that uses the extracted features to make a prediction (see Figure \ref{fig:nn_conv}). Let's look at the functioning of convolutional and pooling layers.
+\paragraph{} Convolutional neural networks (\acsp{cnn}) are feed-forward networks that work very well especially for image recognition and complex visual tasks in general \cite{OReilly:handsonML}. A typical \acs{cnn} architecture consists of different building blocks: the convolutional layers, which identify low-level features in the image and learn to assemble them into higher-level features; the pooling layers, which subsample the image in order to reduce its dimensionality; finally, the dense network, which is at the end of the architecture and that uses the extracted features to make a prediction (see Figure \ref{fig:nn_conv}). Let's look at the functioning of convolutional and pooling layers.
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=1\textwidth]{nn_conv}
@@ -382,7 +390,7 @@ When used for classification tasks, the output layer of a dense neural network h
     \label{fig:nn_conv}
 \end{figure}
 
-Convolutional layers are different from dense layers since they are not fully-connected: in convolutional layers, neurons are not connected to all previous layer's neurons, but only to neurons in their receptive fields. If we represent one layer's neurons mapped in 2D as a matrix, we can say that each neuron in the current matrix $l$ looks at a limited region of the previous matrix $l-1$, so it is connected only to neurons located within that region, as shown in Figure \ref{fig:nn_conv_layer}. This architecture allows to focus on low-level features in the first layer, where neurons look at small regions of the input image, and to aggregate them in high-level features in the following layers, where neurons combine lower-level features form the previous layer.
+Convolutional layers are different from dense layers only for the fact that they are not fully-connected: in convolutional layers, neurons are not connected to all previous layer's neurons, but only to neurons in their receptive fields. If we represent one layer's neurons mapped in 2D as a matrix, we can say that each neuron in the current matrix $l$ looks at a limited region of the previous matrix $l-1$, so it is connected only to neurons located within that region, as shown in Figure \ref{fig:nn_conv_layer}. This architecture allows to focus on low-level features in the first layer, where neurons look at small regions of the input image, and to aggregate them in high-level features in the following layers, where neurons combine lower-level features form the previous layer.
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.35\textwidth]{nn_conv_layer}
@@ -392,13 +400,13 @@ Convolutional layers are different from dense layers since they are not fully-co
 
 \begin{figure}[htbp]
     \centering
-    \begin{subfigure}[t]{0.3\textwidth}
+    \begin{subfigure}[t]{0.25\textwidth}
 		\includegraphics[width=1\textwidth]{nn_conv_padding}
         \caption{Zero padding}
         \label{fig:nn_conv_padding}
 	\end{subfigure}
 	~
-	\begin{subfigure}[t]{1\textwidth}
+	\begin{subfigure}[t]{0.8\textwidth}
 		\includegraphics[width=1\textwidth]{nn_conv_stride}
         \caption{Sequence of receptive fields with stride equal to 2}
         \label{fig:nn_conv_stride}
@@ -417,15 +425,13 @@ In a convolutional layer, neurons weights are represented by \textit{filters} (a
     \label{fig:nn_conv_filter}
 \end{figure}
 
-Convolutional layers are usually followed by pooling layers. As already mentioned, the goal of a pooling layer is to subsample the input image in order to reduce its dimensionality; this action has the positive effects of cutting down the computational and memory loads and of reducing the number of parameters, thus diminishing the risk of overfitting. A pooling layer is very similar to a convolutional layer, since it is focused on a receptive field too and it has configurable size, padding and stride. The crucial difference is that a pooling layer doesn't have weights, but instead it aggregates all the information in a receptive field by using an aggregation function (for example the mean or max functions). The pooling layer works on every channel (or feature map) independently, so the output has the same depth as the input.
+Convolutional layers are usually followed by pooling layers. As already mentioned, the goal of a pooling layer is to subsample the input image in order to reduce its dimensionality; this action has the positive effects of cutting down the computational and memory loads and of reducing the number of parameters, thus diminishing the risk of overfitting. A pooling layer is very similar to a convolutional layer, since it is focused on a receptive field too and it has configurable size, padding and stride. The crucial difference is that a pooling layer doesn't have weights, but instead it aggregates all the information in a receptive field by using an aggregation function (for example the mean or max functions). The pooling layer works on every channel (or feature map) independently, so the output has the same depth as the input. The advantage of using a pooling layer also results from the added capability of the model’s invariance to local translation. This means that, since the pooling layer outputs a summarized version of the features detected in a certain area of the input, a small translation of the input generate almost no change in the pooled output.
 
 Through convolutional and pooling layers, a \acs{cnn} is able to learn high-level features, while reducing the data dimensionality, and to use this information to make predictions through the dense neural network at the end of the architecture.
 
 
-\subsection{\acs{lstm} neural network}
-\paragraph{} \acs{lstm} neural networks are a special case of a more general category, which is the recurrent neural networks \cite{OReilly:handsonML}; therefore we are going to first present the basics of recurrent neural networks and then explore \acs{lstm} neural networks.
-
-Recurrent neural networks (\acsp{rnn}) are usually used to analyze sequences of data and time series in order to predict the future, thanks to their ability to "memorize" past information. This is due to the fact that they are not feed-forward network, since the output of a neuron is sent back to itself. In other words, at each time step $t$, a recurrent neuron receives the features of the input $x_t$ as well as its own output $y_{t-1}$ from the previous time step. In this way, each input of a recurrent neuron is determined by the current input instance alongside with some information from all the previous instances. Expanding this logic to an entire layer of recurrent neurons, at each time step $t$, each neuron receives both the input $x_t$ as well as the entire layer's output $y_{t-1}$ from the previous time step. Figure \ref{fig:nn_recurrent} illustrates the logic behind a recurrent neural network, showing the network unrolled through time.
+\subsection{Recurrent neural network}
+ \paragraph{} Recurrent neural networks (\acsp{rnn}) are usually used to analyze sequences of data and time series in order to predict the future, thanks to their ability to "memorize" past information \cite{OReilly:handsonML}. This is due to the fact that they are not feed-forward network, since the output of a neuron is sent back to itself. In other words, at each time step $t$, a recurrent neuron receives the features of the input $x_t$ as well as its own output $y_{t-1}$ from the previous time step. In this way, each input of a recurrent neuron is determined by the current input instance alongside with some information from all the previous instances. Expanding this logic to an entire layer of recurrent neurons, at each time step $t$, each neuron receives both the input $x_t$ as well as the entire layer's output $y_{t-1}$ from the previous time step. Figure \ref{fig:nn_recurrent} illustrates the logic behind a recurrent neural network, showing the network unrolled through time.
 \begin{figure}[t]
     \centering
     \includegraphics[width=1\textwidth]{nn_recurrent}
@@ -446,7 +452,9 @@ We can say that the network is able to store some sort of "memory" of the past i
 
 The standard recurrent neural network model presents some drawbacks. First of all, when the network is trained on long sequences, it may suffer form the vanishing/exploding gradient problem, leading to convergence issues in the training procedure. Moreover, on the long run, the memory of information about the first time steps tends to fade away, since part of the information is lost at each step. We could consider the \acs{rnn} to have a short-term memory, which is not optimal when we need to predict events based on a long sequence of time steps. That is where the \acs{lstm} neural network comes in.
 
-An \acs{lstm} neural network, differently from a \acs{rnn}, is made of \textit{Long Short-Term Memory} (\acs{lstm}) cells \cite{NeuralComputation:lstm}. This type of cells allows the model to perform much better and to converge faster, in addition to preserving long-term information in long sequences. As shown in Figure \ref{fig:rnn_vs_lstm}, while the standard \acs{rnn} cell contains only a single computational unit (showed as a yellow box), the \acs{lstm} cell contains four interacting units (or layers), each one having a well-defined purpose. An \acs{lstm} cell keeps "in memory" two states, one for the short-term memory and the other for the long-term memory, respectively $\mathbf{h}_t$ and $\mathbf{C}_t$ (also called \textit{cell state}). The first one is the same that we saw for standard recurrent network's cells, while the cell state is what makes the \acs{lstm} model so special.
+
+\subsection{\acs{lstm} neural network}
+\paragraph{} An \acs{lstm} neural network, differently from a \acs{rnn}, is made of \textit{Long Short-Term Memory} (\acs{lstm}) cells \cite{NeuralComputation:lstm}. This type of cells allows the model to perform much better and to converge faster, in addition to preserving long-term information in long sequences. As shown in Figure \ref{fig:rnn_vs_lstm}, while the standard \acs{rnn} cell contains only a single computational unit (showed as a yellow box), the \acs{lstm} cell contains four interacting units (or layers), each one having a well-defined purpose. An \acs{lstm} cell keeps "in memory" two states, one for the short-term memory and the other for the long-term memory, respectively $\mathbf{h}_t$ and $\mathbf{C}_t$ (also called \textit{cell state}). The first one is the same that we saw for standard recurrent network's cells, while the cell state is what makes the \acs{lstm} model so special.
 \begin{figure}[t]
     \centering
     \begin{subfigure}[t]{0.8\textwidth}
