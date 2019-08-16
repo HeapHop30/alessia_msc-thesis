@@ -2,6 +2,74 @@
 % IMPLEMENTATION
 %************************************************
 
-    \chapter{Implementation} \label{chap: implementation}
+\chapter{Implementation} \label{chap: implementation}
 
-\paragraph{} \textit{In this chapter ...}
+\paragraph{} \textit{In this chapter we present the tools that have been used for the implementation of the project, some details about the data, the data preprocessing procedure, a description of the models' configurations and experiments conducted and the produced results.}
+
+
+%----------------------------------------------------------------
+% Tools
+%----------------------------------------------------------------
+
+\section{Tools} \label{sec: tools}
+\paragraph{} All the computation for this project has been conducted on a university server equipped with Ubuntu SMP version 16.04.1 and a NVIDIA TITAN Xp graphics card for the deep learning training processes. A brief description of the software tools used for the project will follow.
+
+\paragraph{Python} \cite{python} The programming language used for this project is Python v3.6. Python is a general purpose language, known for its ease of use and understanding; however, thanks to the addition of dedicated libraries for data analysis and predictive modeling, in the last few years it has become the reference and most-used language for data science.
+
+\paragraph{Numpy} \cite{numpy} Numpy is an extremely popular and useful library for scientific computing with Python. It allows to easily handle multidimensional data through matrix representation and to perform operation between them thanks to its broadcasting functions. Numpy has been used in all the project implementation's steps to handle and manipulate the data.
+
+\paragraph{Pandas} \cite{pandas} Pandas is an open source library which provides efficient, flexible and easy-to-use data structures and data analysis tools for Python. Pandas is built on top of Numpy library and it is suited to handle almost any kind of data, representing them in a handy tabular form. We mainly used Pandas in order to store the results from the experiments.
+
+\paragraph{matplotlib} \cite{matplotlib} Matplotlib is a 2D plotting library and it represents one of the most common visualization tools for Python. Its \texttt{pyplot} module provides a MATLAB-like functional interface and a wide degree of customization of the generated figures. All the plots in this thesis has been generated using matplotlib library.
+
+\paragraph{scikit-learn} \cite{scikit-learn} Scikit-learn is a well-known, simple and efficient library for data analysis and machine learning in Python. It is open-source and is built on NumPy, SciPy, and matplotlib libraries. It provides several useful tools for data preprocessing, model selection, classification, regression, clustering and dimensionality reduction. In this project, it has been heavily used for the data preprocessing and to implement the classic machine learning models.
+
+\paragraph{XGBoost} \cite{xgboost} XGBoost is an optimized library for distributed gradient boosting, designed to be highly efficient, flexible and portable. It implements a tree-based gradient boosting model which has been used for the gradient boosting experiments.
+
+\paragraph{Tensorflow \& Keras} \cite{tensorflow} \cite{keras} The framework we used in order to build deep learning models is Tensorflow v2.0. Tensorflow is one of the most popular frameworks for machine learning and deep learning; it is open-source and it provides a flexible ecosystem of tools, libraries and community resources to easily build machine learning models. On top of Tensorflow, we used Keras high-level neural networks API. Keras was originally a library separated from Tensorflow, providing ready-to-use tools for fast experimentation and developing of neural networks models by running on top of TensorFlow, CNTK, or Theano. With the update to version 2.0 of Tensorflow, Keras has officially become part of Tensorflow API. We mainly used Keras library on top of Tensorflow for the implementation of deep learning models in order to generate high-level and easy-to-understand code. This choice was reasoned by the fact that this thesis project is also related to the medical field, so we tried to make the code readable also by people which are not specialized in the data scientist field.
+
+\paragraph{Spektral} \cite{Spektral} Spektral is a Python library for graph deep learning, based on the Keras API. It provides a simple but flexible framework for creating graph neural networks (\acsp{gnn}) by making available several ready-to-use, but still highly customizable, graph-based deep learning layers. It also implements functions for the creation of a functional connectivity network from a data stream. In this project, Spektral library was used for the generation of functional connectivity graphs and for the implementation of graph-based deep learning models.
+
+
+%----------------------------------------------------------------
+% Data analysis
+%----------------------------------------------------------------
+
+\section{Data analysis} \label{sec: data_analysis}
+
+
+%----------------------------------------------------------------
+% Data preprocessing
+%----------------------------------------------------------------
+
+\section{Data preprocessing} \label{sec: data_preprocessing}
+
+\subsection{Time steps as samples}
+\subsection{Sequences of time steps as samples}
+\subsection{Sequences of graphs as samples}
+\subsection{Cross-validation}
+
+%----------------------------------------------------------------
+% Experiments
+%----------------------------------------------------------------
+
+\section{Experiments} \label{sec: experiments}
+
+\subsection{Support Vector Machine experiments}
+\subsection{Random forest experiments}
+\subsection{Gradient boosting experiments}
+\subsection{Dense neural network experiments}
+\subsection{LSTM neural network experiments}
+\subsection{Convolutional neural network experiments}
+\subsection{Graph-based LSTM neural network experiments}
+\subsection{Graph-based convolutional neural network experiments}
+
+
+%----------------------------------------------------------------
+% Results
+%----------------------------------------------------------------
+
+\section{Results} \label{sec: results}
+
+\subsection{Experiments results}
+
