@@ -37,6 +37,72 @@
 
 \section{Data analysis} \label{sec: data_analysis}
 
+\paragraph{} For this project, we were provided with 24 hours of \acs{ieeg} data generated from real measurements on a patient suffering form epilepsy. The data contains three seizures, all happening during the first three hours of recording; therefore just the data regarding the first three hours have been used in the project. The brain activity has been measured using 90 electrodes and a sampling frequency of 500 Hz, so each hour contains $1\,800\,000$ time steps of measurements.
+
+First thing, we identified the position of the seizures in the data and their length. As already mentioned, the data contains three seizures in total, each one having a duration between $13\,000$ and $15\,000$ time steps, for a total of $42\,000$ time steps of seizure. This corresponds to 26 to 30 seconds of duration for each seizure and 84 seconds of seizure in total. Since the most important data for this project were the seizure time steps and we didn't need a huge amount of non-seizure time steps, during all the project we considered only a portion of data around each one of the three seizures, obtaining $450\,000$ time steps (15 minutes) to work with between seizure and non-seizure data in total. This should give an idea of how much limited the amount of useful data was for this project.
+
+Some basic statistical measurements have been applied to the \acs{ieeg} data in order to familiarize with its features. The measured voltage in the \acs{ieeg} vary between about $-9\,500$ and $9\,800$ \acs{nv} (nanovolts), covering a range of about $19\,300$ \acs{nv}. Each electrode's signal oscillate through time with a standard deviation of around 82 \acs{nv} and the various electrodes signals cover different areas of the \acs{ieeg} voltage range. In Figure \ref{fig:plot_seizures} the plots of the \acs{ieeg} around the three seizures is shown. The start and end times of the seizures in each plot are indicated by red vertical lines.
+\newpage
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[t]{0.7\textwidth}
+		\includegraphics[width=1\textwidth]{plot_seizure1}
+        \caption{First epileptic seizure}
+        \label{fig:plot_seizure1}
+	\end{subfigure}
+	~
+	\begin{subfigure}[t]{0.7\textwidth}
+		\includegraphics[width=1\textwidth]{plot_seizure2}
+        \caption{Second epileptic seizure}
+        \label{fig:plot_seizure2}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[t]{0.7\textwidth}
+		\includegraphics[width=1\textwidth]{plot_seizure3}
+        \caption{Third epileptic seizure}
+        \label{fig:plot_seizure3}
+	\end{subfigure}
+    \caption{Plots of the \acs{ieeg} around the three epileptic seizures (we suggest to zoom-in the figures in the pdf file)}
+    \label{fig:plot_seizures}
+\end{figure}
+\newpage
+
+Looking at Figure \ref{fig:plot_seizures}, it seems like the \acsp{ieeg} is not able to explicitly show the presence of a seizure, since the dynamic of the electrodes signals doesn't seem to undergo a big change in correspondence of the beginning of a seizure. This behaviour suggests that the seizure could not be directly represented by the dynamic of the signals, but it could be represented by the non-linear relations between the electrodes signal's dynamic through time.
+
+The amount of positive time steps, that are the ones inside the seizure portions, corresponds only to the $9.3$\% of the data, with the remaining $90.7$\% of data being negative time steps; therefore we are dealing with very unbalanced data (see Figure \ref{fig:hist_classes}). The extreme unbalance of the data, together with the severe restriction in the amount of data, make this dataset very difficult to work with, but at the same time very similar to a real-world scenario.
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.6\textwidth]{hist_classes}
+    \caption{Histogram of the number of time step for each class}
+    \label{fig:hist_classes}
+\end{figure}
+
+In order to have an idea of the linear relation between electrodes values, we computed the Pearson correlation coefficient on two sequences of 5 seconds each, one of negative time steps and the other of positive time steps. In Figure \ref{fig:corr_heatmaps} we show the related correlation heatmaps. As you can see from the figures, the correlation heatmap related to the positive time steps reveals a higher linear relation between electrodes values if compared to the correlation heatmap related to the negative time steps. The correlation heatmaps, however, present only the linear relations between data, while we believe that there are hidden non-linear relation between electrodes signal through time which could be crucial for the identification of epileptic seizures.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[t]{0.5\textwidth}
+		\includegraphics[width=1\textwidth]{corr_nonseizure}
+        \caption{Correlation heatmap of 5 seconds of negative time steps}
+        \label{fig:corr_nonseizure}
+	\end{subfigure}%
+	~
+	\begin{subfigure}[t]{0.5\textwidth}
+		\includegraphics[width=1\textwidth]{corr_seizure}
+        \caption{Correlation heatmap of 5 seconds of positive time steps}
+        \label{fig:corr_seizure}
+    \end{subfigure}
+    \caption{Comparison of correlation heatmaps related to negative and positive time steps}
+    \label{fig:corr_heatmaps}
+\end{figure}
+
+To have another confirm of the presence of some linear relation between electrodes signals, we computed the standard deviation of the oscillation of each electrode, but this time we computed the mean of the standard deviation both over the negative time steps and over the positive ones. The average standard deviation of the oscillation of each electrode over the negative time steps was around 80 \acs{nv}, while the one over the positive time steps was around 93 \acs{nv}. This shows that, during an epileptic seizure, electrodes signals tends to have wider fluctuation margins, but the difference from the standard fluctuation margins doesn't seems to be enough to identify a seizure.
+
+
+
+
+
+
 
 %----------------------------------------------------------------
 % Data preprocessing
@@ -59,8 +125,8 @@
 \subsection{Random forest experiments}
 \subsection{Gradient boosting experiments}
 \subsection{Dense neural network experiments}
-\subsection{LSTM neural network experiments}
 \subsection{Convolutional neural network experiments}
+\subsection{LSTM neural network experiments}
 \subsection{Graph-based LSTM neural network experiments}
 \subsection{Graph-based convolutional neural network experiments}
 
