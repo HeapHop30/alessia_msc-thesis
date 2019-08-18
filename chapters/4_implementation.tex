@@ -28,7 +28,7 @@
 
 \paragraph{Tensorflow \& Keras} \cite{tensorflow} \cite{keras} The framework we used in order to build deep learning models is Tensorflow v2.0. Tensorflow is one of the most popular frameworks for machine learning and deep learning; it is open-source and it provides a flexible ecosystem of tools, libraries and community resources to easily build machine learning models. On top of Tensorflow, we used Keras high-level neural networks API. Keras was originally a library separated from Tensorflow, providing ready-to-use tools for fast experimentation and developing of neural networks models by running on top of TensorFlow, CNTK, or Theano. With the update to version 2.0 of Tensorflow, Keras has officially become part of Tensorflow API. We mainly used Keras library on top of Tensorflow for the implementation of deep learning models in order to generate high-level and easy-to-understand code. This choice was reasoned by the fact that this thesis project is also related to the medical field, so we tried to make the code readable also by people which are not specialized in the data scientist field.
 
-\paragraph{Spektral} \cite{Spektral} Spektral is a Python library for graph deep learning, based on the Keras API. It provides a simple but flexible framework for creating graph neural networks (\acsp{gnn}) by making available several ready-to-use, but still highly customizable, graph-based deep learning layers. It also implements functions for the creation of a functional connectivity network from a data stream. In this project, Spektral library was used for the generation of functional connectivity graphs and for the implementation of graph-based deep learning models.
+\paragraph{Spektral} \cite{Spektral} Spektral is a Python library for graph deep learning, based on the Keras API. It provides a simple but flexible framework for creating graph neural networks (\acsp{gnn}) by making available several ready-to-use, but still highly customizable, graph-based deep learning layers. It also implements functions for the creation of the functional connectivity network from a data stream. In this project, Spektral library was used for the generation of functional connectivity graphs and for the implementation of graph-based deep learning models.
 
 
 %----------------------------------------------------------------
@@ -41,30 +41,53 @@
 
 First thing, we identified the position of the seizures in the data and their length. As already mentioned, the data contains three seizures in total, each one having a duration between $13\,000$ and $15\,000$ time steps, for a total of $42\,000$ time steps of seizure. This corresponds to 26 to 30 seconds of duration for each seizure and 84 seconds of seizure in total. Since the most important data for this project were the seizure time steps and we didn't need a huge amount of non-seizure time steps, during all the project we considered only a portion of data around each one of the three seizures, obtaining $450\,000$ time steps (15 minutes) to work with between seizure and non-seizure data in total. This should give an idea of how much limited the amount of useful data was for this project.
 
-Some basic statistical measurements have been applied to the \acs{ieeg} data in order to familiarize with its features. The measured voltage in the \acs{ieeg} vary between about $-9\,500$ and $9\,800$ \acs{nv} (nanovolts), covering a range of about $19\,300$ \acs{nv}. Each electrode's signal oscillate through time with a standard deviation of around 82 \acs{nv} and the various electrodes signals cover different areas of the \acs{ieeg} voltage range. In Figure \ref{fig:plot_seizures} the plots of the \acs{ieeg} around the three seizures is shown. The start and end times of the seizures in each plot are indicated by red vertical lines.
+Some basic statistical measurements have been applied to the \acs{ieeg} data in order to familiarize with its features. The measured voltage in the \acs{ieeg} vary between about $-9\,500$ and $9\,800$ \acs{uv} (microvolts), covering a range of about $19\,300$ \acs{uv}. Each electrode's signal oscillate through time with a standard deviation of around 82 \acs{uv} and the various electrodes signals cover different areas of the \acs{ieeg} voltage range based on their placement on the brain surface. In Figure \ref{fig:plot_seizures} the plots of the \acs{ieeg} around the three seizures is shown. The start and end times of the seizures in each plot are indicated by red vertical lines.
+\todo{Change following 3 iEEGs to high-quality corresponding images}
 \newpage
 \begin{figure}[H]
     \centering
     \begin{subfigure}[t]{0.7\textwidth}
-		\includegraphics[width=1\textwidth]{plot_seizure1}
+		\includegraphics[width=1\textwidth]{plot_seizure1_lowquality}
         \caption{First epileptic seizure}
         \label{fig:plot_seizure1}
 	\end{subfigure}
 	~
 	\begin{subfigure}[t]{0.7\textwidth}
-		\includegraphics[width=1\textwidth]{plot_seizure2}
+		\includegraphics[width=1\textwidth]{plot_seizure2_lowquality}
         \caption{Second epileptic seizure}
         \label{fig:plot_seizure2}
     \end{subfigure}
     ~
     \begin{subfigure}[t]{0.7\textwidth}
-		\includegraphics[width=1\textwidth]{plot_seizure3}
+		\includegraphics[width=1\textwidth]{plot_seizure3_lowquality}
         \caption{Third epileptic seizure}
         \label{fig:plot_seizure3}
 	\end{subfigure}
     \caption{Plots of the \acs{ieeg} around the three epileptic seizures (we suggest to zoom-in the figures in the pdf file)}
     \label{fig:plot_seizures}
 \end{figure}
+% \begin{figure}[H]
+%     \centering
+%     \begin{subfigure}[t]{0.7\textwidth}
+% 		\includegraphics[width=1\textwidth]{plot_seizure1}
+%         \caption{First epileptic seizure}
+%         \label{fig:plot_seizure1}
+% 	\end{subfigure}
+% 	~
+% 	\begin{subfigure}[t]{0.7\textwidth}
+% 		\includegraphics[width=1\textwidth]{plot_seizure2}
+%         \caption{Second epileptic seizure}
+%         \label{fig:plot_seizure2}
+%     \end{subfigure}
+%     ~
+%     \begin{subfigure}[t]{0.7\textwidth}
+% 		\includegraphics[width=1\textwidth]{plot_seizure3}
+%         \caption{Third epileptic seizure}
+%         \label{fig:plot_seizure3}
+% 	\end{subfigure}
+%     \caption{Plots of the \acs{ieeg} around the three epileptic seizures (we suggest to zoom-in the figures in the pdf file)}
+%     \label{fig:plot_seizures}
+% \end{figure}
 \newpage
 
 Looking at Figure \ref{fig:plot_seizures}, it seems like the \acsp{ieeg} is not able to explicitly show the presence of a seizure, since the dynamic of the electrodes signals doesn't seem to undergo a big change in correspondence of the beginning of a seizure. This behaviour suggests that the seizure could not be directly represented by the dynamic of the signals, but it could be represented by the non-linear relations between the electrodes signal's dynamic through time.
@@ -81,13 +104,13 @@ In order to have an idea of the linear relation between electrodes values, we co
 
 \begin{figure}[htbp]
     \centering
-    \begin{subfigure}[t]{0.5\textwidth}
+    \begin{subfigure}[t]{0.49\textwidth}
 		\includegraphics[width=1\textwidth]{corr_nonseizure}
         \caption{Correlation heatmap of 5 seconds of negative time steps}
         \label{fig:corr_nonseizure}
 	\end{subfigure}%
 	~
-	\begin{subfigure}[t]{0.5\textwidth}
+	\begin{subfigure}[t]{0.49\textwidth}
 		\includegraphics[width=1\textwidth]{corr_seizure}
         \caption{Correlation heatmap of 5 seconds of positive time steps}
         \label{fig:corr_seizure}
@@ -96,19 +119,14 @@ In order to have an idea of the linear relation between electrodes values, we co
     \label{fig:corr_heatmaps}
 \end{figure}
 
-To have another confirm of the presence of some linear relation between electrodes signals, we computed the standard deviation of the oscillation of each electrode, but this time we computed the mean of the standard deviation both over the negative time steps and over the positive ones. The average standard deviation of the oscillation of each electrode over the negative time steps was around 80 \acs{nv}, while the one over the positive time steps was around 93 \acs{nv}. This shows that, during an epileptic seizure, electrodes signals tends to have wider fluctuation margins, but the difference from the standard fluctuation margins doesn't seems to be enough to identify a seizure.
-
-
-
-
-
-
+To have another confirmation of the presence of some linear relation between electrodes signals, we computed the standard deviation of the oscillation of each electrode, but this time we computed the mean of the standard deviation both over the negative time steps and over the positive ones. The average standard deviation of the oscillation of each electrode over the negative time steps was around 80 \acs{uv}, while the one over the positive time steps was around 93 \acs{uv}. This shows that, during an epileptic seizure, electrodes signals tends to have wider fluctuation margins, but the difference from the standard fluctuation margins doesn't seems to be enough to identify a seizure.
 
 %----------------------------------------------------------------
 % Data preprocessing
 %----------------------------------------------------------------
 
 \section{Data preprocessing} \label{sec: data_preprocessing}
+\paragraph{} Once we familiarized with the dataset, we preprocessed it in order to shape it to the right form to be the input of machine learning and deep learning models for the different prediction tasks. As already mentioned in Section \ref{sec: step_data_preprocessing}, we divided the data in a training set and a test set, using two seizures' data in the training set and the remaining seizure's data in the test set. We sacrificed the validation set for lack of data. Then the data was prepared to be used by different models for the three prediction tasks described in Section \ref{sec: problem_definition}. Depending on the model and on the task at hand, a sample could represent a time step, a sequence of samples or a sequence of graphs.
 
 \subsection{Time steps as samples}
 \subsection{Sequences of time steps as samples}
