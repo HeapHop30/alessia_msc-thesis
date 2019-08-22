@@ -168,15 +168,108 @@ This procedure has been implemented with the function \texttt{get\_fc} from \tex
 %----------------------------------------------------------------
 
 \section{Experiments} \label{sec: experiments}
+\paragraph{} As already mentioned in Section \ref{sec: step_models_application}, a big amount of experiments have been conducted in order to apply the chosen machine learning and deep learning models to the three cases of the problem of epileptic seizures prediction. These experiments helped to identify the best-performing configuration for each model on the task at hand. This section will present the models architectures and parameters that have been tested and the best configuration that has been selected for each model, which generated the results described in section \ref{sec: results}. The best configuration was chosen by looking for the best trade-off between the evaluation metrics over the 3-fold cross-validation.
 
 \subsection{Support Vector Machine experiments}
+\paragraph{} The \acs{svm} model has been tested on the problem of detection based on a single time step. We did not make a lot of experiments using \acs{svm}, since the poor results immediately suggested that this machine learning algorithm is too weak to handle the complexity of the seizure prediction task.
+
+In order to test the \acs{svm} model, we used the \texttt{svm.SVC} implementation from scikit-learn library. We kept all the parameters to the default values, except for the \texttt{gamma} and \texttt{class\_weight} parameters. The \acs{svm} has been tested with a penalty parameter $C=1$ and using a Gaussian radial basis function (\acs{rbf}) kernel. The \texttt{gamma} value was set to \texttt{'scale'}, that corresponds to $\frac{1}{F \cdot var(X)}$, where $F$ is the number of features and $var(X)$ is the variance of the input features. We tested both a balanced and an unbalanced version of the \acs{svm} by setting the \texttt{class\_weight} parameter to \texttt{'balanced'} or leaving it to \texttt{None} and we obtained slightly better results using the balanced configuration of the model. Table \ref{tab:svm_param} presents the parameters of the \ref{svm} model that performed better.
+\begin{table}[htbp]
+    \centering
+    \begin{tabular}{ll}
+        \hline
+        \textbf{Parameter}  & \textbf{Value} \\\hline
+        C                   & 1 \\
+        kernel              & \texttt{'rbf'} \\
+        gamma               & \texttt{'scale'} \\
+        balanced            & \texttt{True}
+    \end{tabular}
+    \caption{Parameters of best-performing \acs{svm} model}
+    \label{tab:svm_param}
+\end{table}
+
 \subsection{Random forest experiments}
+\paragraph{} The random forest model has been tested on the problem of detection based on a single time step.
+
+In order to test the random forest model, we used the \texttt{ensemble.RandomForest}-\texttt{Classifier} implementation from scikit-learn library. We kept all the parameters to the default values, except for the \texttt{n\_estimators}, the \texttt{max\_depth} and \texttt{class\_weight} parameters. The \texttt{criterion} parameter to measure the quality of a split was set to \texttt{'gini'}, which corresponds to the Gini impurity function. We tried several values for \texttt{n\_estimators}, which is the number of trees in the forest, and for \texttt{max\_depth}, which is the maximum depth of the tree, in order to find the best balance between the two. We tested both a balanced and an unbalanced version of the random forest classifier by setting the \texttt{class\_weight} parameter to \texttt{'balanced'} or leaving it to \texttt{None} and there was no resulting difference between the two configurations. Table \ref{tab:randomforest_param} presents the parameters of the random forest model that performed better.
+\begin{table}[htbp]
+    \centering
+    \begin{tabular}{ll}
+        \hline
+        \textbf{Parameter}  & \textbf{Value} \\\hline
+        n\_estimators       & 20 \\
+        max\_depth          & 8 \\
+        criterion           & \texttt{'gini'} \\
+        balanced            & \texttt{True/False}
+    \end{tabular}
+    \caption{Parameters of best-performing random forest model}
+    \label{tab:randomforest_param}
+\end{table}
+
 \subsection{Gradient boosting experiments}
+\paragraph{} The gradient boosting model has been tested on the problem of detection based on a single time step.
+
+In order to test the gradient boosting model, we used the \texttt{XGBClassifier} implementation from xgboost library. We kept all the parameters to the default values, except for the \texttt{n\_estimators}, the \texttt{max\_depth} and \texttt{scale\_pos\_weight} parameters. The \texttt{booster} parameter was set to \texttt{'gbtree'} in order to use a tree-based booster. As for the random forest model, we tried different values for \texttt{n\_estimators} and for \texttt{max\_depth} in order to find the best balance between the two. We tested both a balanced and an unbalanced version of the random forest classifier by setting the \texttt{scale\_pos\_weight} parameter to $\frac{\texttt{num\_negative}}{\texttt{num\_positive}}$, which are respectively the number of negative and positive samples, or by leaving it to \texttt{None} and there was no resulting difference between the two configurations. Table \ref{tab:gradientboosting_param} presents the parameters of the gradient boosting model that performed better.
+\begin{table}[htbp]
+    \centering
+    \begin{tabular}{ll}
+        \hline
+        \textbf{Parameter}  & \textbf{Value} \\\hline
+        n\_estimators       & 20 \\
+        max\_depth          & 4 \\
+        booster             & \texttt{'gbtree'} \\
+        balanced            & \texttt{True/False}
+    \end{tabular}
+    \caption{Parameters of best-performing gradient boosting model}
+    \label{tab:gradientboosting_param}
+\end{table}
+
 \subsection{Dense neural network experiments}
+\paragraph{} The dense neural network model has been tested on the problem of detection based on a single time step.
+
+In order to test the \acs{fcnn} model, we used the \texttt{Dense} and \texttt{Dropout} layers implementation from tensorflow.keras library. We investigated several configurations of the model by trying different values for the number of dense layers (\texttt{depth\_dense}), the number of units in each layer (\texttt{units}), the activation function to use (\texttt{activation}), the amount of $\ell_2$ regularization to apply to the kernel (\texttt{kernel\_regularizer}) and the dropout rate to apply between the dense layers (\texttt{dropout}). During the training of the model, we used the \texttt{class\_weight} parameter to compensate the unbalance of the dataset.
+
+The model configuration which obtained the best results is composed by three fully-connected layers, with a dropout layer after each one of them. The first two dense layer have 512 units, while the third one has 256 units, and they all use the \acs{relu} activation function and the $\ell_2$ kernel regularization. After the three dense layers, there is a fourth dense layer with only 1 unit and a sigmoid activation function in order to output the prediction. Table \ref{tab:dense_param} presents the parameters of the dense neural network model that performed better.
+\begin{table}[htbp]
+    \centering
+    \begin{tabular}{ll}
+        \hline
+        \textbf{Parameter}  & \textbf{Value} \\\hline
+        epochs              & 20 \\
+        batch\_size         & 32 \\
+        depth\_dense        & 4 \\
+        units               & 512 / 256 \\
+        activation          & \texttt{'relu'} \\
+        kernel\_regularizer & \texttt{l2(5e-2)} \\
+        dropout             & 0.4 \\
+        class\_weight       & \{0: $\frac{N}{\texttt{num\_negative}}$, 1: $\frac{N}{\texttt{num\_positive}}$\}
+    \end{tabular}
+    \caption{Parameters of best-performing dense neural network model}
+    \label{tab:dense_param}
+\end{table}
+
+
 \subsection{Convolutional neural network experiments}
 \subsection{LSTM neural network experiments}
 \subsection{Graph-based LSTM neural network experiments}
 \subsection{Graph-based convolutional neural network experiments}
+
+% \begin{table}
+%     \centering
+%     \begin{tabular}{lcc}
+%     \hline
+%     & \multicolumn{2}{c}{\textbf{Datasets}} \\
+%     \cline{2-3}
+%     \textbf{Model} & \multicolumn{1}{l}{\textit{Enzymes}} & \multicolumn{1}{l}{\textit{Proteins}}\\
+%     \hline
+%     Paper's model       & 64.17 & 75.46 \\
+%     \hline
+%     \textbf{My model}   & 49.16 & 69.66 \\
+%     My baseline & 55.83 & 63.09 \\
+%     \hline
+%     \end{tabular}
+%     \caption{\label{tab:results2}Classification accuracy percentages in comparison between my model and the paper's model.}
+% \end{table}
 
 
 %----------------------------------------------------------------
@@ -185,5 +278,4 @@ This procedure has been implemented with the function \texttt{get\_fc} from \tex
 
 \section{Results} \label{sec: results}
 
-\subsection{Experiments results}
 
