@@ -227,7 +227,7 @@ In order to test the gradient boosting model, we used the \texttt{XGBClassifier}
 \subsection{Dense neural network experiments}
 \paragraph{} The dense neural network model has been tested on the problem of detection based on a single time step.
 
-In order to test the \acs{fcnn} model, we used the \texttt{Dense} and \texttt{Dropout} layers implementation from tensorflow.keras library. We investigated several configurations of the model by trying different values for the number of dense layers (\texttt{depth\_dense}), the number of units in each layer (\texttt{units}), the activation function to use (\texttt{activation}), the amount of $\ell_2$ regularization to apply to the kernel (\texttt{kernel\_regularizer}) and the dropout rate to apply between the dense layers (\texttt{dropout}). During the training of the model, we used the \texttt{class\_weight} parameter to compensate the unbalance of the dataset.
+In order to test the \acs{fcnn} model, we used the \texttt{Dense} and \texttt{Dropout} layers implementation from Tensorflow's Keras library. We investigated several configurations of the model by trying different values for the number of dense layers (\texttt{depth\_dense}), the number of units in each layer (\texttt{units}), the activation function to use (\texttt{activation}), the amount of $\ell_2$ regularization to apply to the kernel (\texttt{kernel\_regularizer}) and the dropout rate to apply between the dense layers (\texttt{dropout}). During the training of the model, we used the \texttt{class\_weight} parameter to compensate the unbalance of the dataset.
 
 The model configuration which obtained the best results is composed by three fully-connected layers, with a dropout layer after each one of them. The first two dense layer have 512 units, while the third one has 256 units, and they all use the \acs{relu} activation function and the $\ell_2$ kernel regularization. After the three dense layers, there is a fourth dense layer with only 1 unit and a sigmoid activation function in order to output the prediction. Table \ref{tab:dense_param} presents the parameters of the dense neural network model that performed better.
 \begin{table}[htbp]
@@ -248,11 +248,145 @@ The model configuration which obtained the best results is composed by three ful
     \label{tab:dense_param}
 \end{table}
 
-
 \subsection{Convolutional neural network experiments}
-\subsection{LSTM neural network experiments}
-\subsection{Graph-based LSTM neural network experiments}
+\paragraph{} The convolutional neural network model has been tested on the problems of detection and prediction based on a sequence of time steps.
+
+In order to test the \acs{cnn} model, we used the \texttt{Conv1D}, \texttt{MaxPooling1D}, \texttt{Flatten}, \texttt{Dense}, \texttt{Dropout} and \texttt{BatchNormalization} layers implementation from Tensorflow's Keras library. We investigated several configurations of the model by first trying different values for the main parameters of the neural network: the number of convolutional layers (\texttt{depth\_conv}), the number of dense layers for the prediction (\texttt{depth\_dense}), the number of output filters in the convolution (\texttt{filters}), the length of the convolution window (\texttt{kernel\_size}), the activation function to use (\texttt{activation}), the amount of $\ell_2$ regularization to apply to the kernel (\texttt{kernel\_regularizer}), the presence of batch normalization (\texttt{batch\_norm}) and the dropout rate (\texttt{dropout}) to apply between the dense layers. During the training of the model, we used the \texttt{class\_weight} parameter to compensate the unbalance of the dataset.
+
+After the first promising results, we tried to improve the performances of the model by using dilated convolution. Using this technique, the filter is "dilated" before its application, meaning that its size is expanded by filling the empty positions with zeros. This means that the filter's dimensions are not altered, but its weights are matched to not-adjacent instances in the input matrix. The distance between the instances is determined by the dilation rate $D$. Figure \ref{fig:nn_conv_dilated} shows an example of a $3 \times 3$ dilated convolution with $D=2$.
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{nn_conv_dilated}
+    \caption{Sequence of receptive fields with dilation rate equal to 2 (from \textit{Medium - Towards Data Science})}
+    \label{fig:nn_conv_dilated}
+\end{figure}
+
+In order to test the model with dilated convolution, we added the dilation rate (\texttt{dilation\_rate}) parameter to the hyperparameters search and we set the padding (\texttt{padding}) to \texttt{'causal'}. In this way, we are limiting the filter at time step $t$ so that it can only see inputs that are no later than $t$. This is done by padding the layer's input with zeros in the front. In order to generalize better, we also added a max-pooling layer after each convolutional layer (\texttt{pooling}).
+
+The \acs{cnn} model was tested both on detection and prediction problems and on different values of \texttt{look\_back} and \texttt{target\_steps\_ahead} for the creation of the input sequences, so we identified different "best" configurations. In general, the architecture that worked better is composed by two or three convolutional layers, each one followed by a max-pooling layer, and by two final fully-connected layers (the first one having 256 units), with a batch normalization layer and a dropout layer between the two. The convolutional layers use 64 filters, except for the last one which uses 32 filters; the kernel size is set to 3 and the convolution is made with a dilation rate equal to 3. All the layers use the \acs{relu} activation function and the $\ell_2$ kernel regularization, except for the last dense layer, which has only 1 unit and which uses a sigmoid activation function in order to output the prediction. 
+
+Table \ref{tab:conv_param} presents the parameters of the dense neural network model that performed better. The best-performing parameters are the same both for the detection and prediction problems, with the only difference in the number of convolutional layers, which for the prediction task varies between two and three depending on the value of \texttt{target\_steps\_ahead}.
+\begin{table}[htbp]
+    \centering
+    \begin{tabular}{ll}
+        \hline
+        \textbf{Parameter}  & \textbf{Value} \\\hline
+        epochs              & 10 \\
+        batch\_size         & 64 \\
+        depth\_conv         & 2 \\
+        depth\_dense        & 2 \\
+        filters             & 64 \\
+        kernel\_size        & 3 \\
+        activation          & \texttt{'relu'} \\
+        batch\_norm         & \texttt{True} \\
+        kernel\_regularizer & \texttt{l2(5e-1)} \\
+        dropout             & 0.4 \\
+        pooling             & \texttt{True} \\
+        pool\_size          & 2 \\
+        padding             & \texttt{'causal'} \\
+        dilation\_rate      & 3 \\
+        class\_weight       & \{0: $\frac{N}{\texttt{num\_negative}}$, 1: $\frac{N}{\texttt{num\_positive}}$\}
+    \end{tabular}
+    \caption{Parameters of best-performing convolutional neural network model}
+    \label{tab:conv_param}
+\end{table}
+
+\subsection{\acs{lstm} neural network experiments}
+\paragraph{} The \acs{lstm} neural network model has been tested on the problems of detection and prediction based on a sequence of time steps.
+
+In order to test the \acs{lstm} model, we used the \texttt{LSTM}, \texttt{Dense}, \texttt{Dropout} and \texttt{Batch}-\texttt{Normalization} layers implementation from Tensorflow's Keras library. We investigated several configurations of the model by trying different values for the number of \acs{lstm} layers (\texttt{depth\_lstm}), the number of dense layers (\texttt{depth\_dense}), the number of units in each \acs{lstm} layer (\texttt{units\_lstm}), the activation function to use (\texttt{activation}), the amount of $\ell_2$ regularization to apply to the kernel (\texttt{kernel\_regularizer}), the presence of batch normalization (\texttt{batch\_norm}) and the dropout rate (\texttt{dropout}) to apply between the layers. During the training of the model, we used the \texttt{class\_weight} parameter to compensate the unbalance of the dataset.
+
+The \acs{lstm} model was tested both on detection and prediction problems and on different values of \texttt{look\_back} and \texttt{target\_steps\_ahead} for the creation of the input sequences; however we identified a single configuration that obtained the best results in all the tasks. The architecture that worked better is composed by one \acs{lstm} layer followed by two fully-connected layers (the first one having 256 units), with a batch normalization layer and a dropout layer between the three layers. The \acs{lstm} layer uses 256 units and all the layers use the \acs{relu} activation function and the $\ell_2$ kernel regularization, except for the last dense layer, which has only 1 unit and which uses a sigmoid activation function in order to output the prediction. Table \ref{tab:lstm_param} presents the parameters of the \acs{lstm} neural network model that performed better.
+\begin{table}[htbp]
+    \centering
+    \begin{tabular}{ll}
+        \hline
+        \textbf{Parameter}  & \textbf{Value} \\\hline
+        epochs              & 15 \\
+        batch\_size         & 64 \\
+        depth\_lstm         & 1 \\
+        depth\_dense        & 2 \\
+        units\_lstm         & 256 \\
+        activation          & \texttt{'relu'} \\
+        batch\_norm         & \texttt{True} \\
+        kernel\_regularizer & \texttt{l2(5e-1)} \\
+        dropout             & 0.4 \\
+        class\_weight       & \{0: $\frac{N}{\texttt{num\_negative}}$, 1: $\frac{N}{\texttt{num\_positive}}$\}
+    \end{tabular}
+    \caption{Parameters of best-performing \acs{lstm} neural network model}
+    \label{tab:lstm_param}
+\end{table}
+
 \subsection{Graph-based convolutional neural network experiments}
+\paragraph{} The graph-based convolutional neural network model has been tested on the problems of detection and prediction based on a sequence of graphs.
+
+The graph-based \acs{cnn} model has been implemented and tested in the same way as the standard \acs{cnn} model, conducting hyperparameters search on the same parameters and using a similar architecture. The main difference is the addition of an edge-conditioned convolutional layer (\acs{ecc}), followed by a global average-pooling, just before the use of the standard \acs{cnn}. This is necessary in order to convert the input graphs into expressive features that can be processed by the standard \acs{cnn}. In addition to the \acs{cnn} parameters, we tested different values also for the number of output filters in the edge-conditioned convolution (\texttt{g\_filters}).
+
+The graph-based \acs{cnn} model was tested both on detection and prediction problems and on different values of \texttt{look\_back} and \texttt{target\_steps\_ahead} for the creation of the input sequences; however we identified a single configuration that obtained the best results in all the tasks, even though the graph-based \acs{cnn} performance in general were poor. As already mentioned, the configuration is the same as for the standard \acs{cnn} with a \acs{ecc} and a global average-pooling layers added at the beginning. Table \ref{tab:gconv_param} presents the parameters of the graph-based convolutional neural network model that performed better.
+\begin{table}[htbp]
+    \centering
+    \begin{tabular}{ll}
+        \hline
+        \textbf{Parameter}  & \textbf{Value} \\\hline
+        epochs              & 200 \\
+        batch\_size         & 32 \\
+        depth\_conv         & 3 \\
+        depth\_dense        & 2 \\
+        filters             & 64 \\
+        kernel\_size        & 3 \\
+        g\_filters          & 32 \\
+        activation          & \texttt{'relu'} \\
+        batch\_norm         & \texttt{True} \\
+        kernel\_regularizer & \texttt{l2(5e-3)} \\
+        dropout             & 0.4 \\
+        pooling             & \texttt{True} \\
+        pool\_size          & 2 \\
+        padding             & \texttt{'causal'} \\
+        dilation\_rate      & 3 \\
+        class\_weight       & \{0: $\frac{N}{\texttt{num\_negative}}$, 1: $\frac{N}{\texttt{num\_positive}}$\}
+    \end{tabular}
+    \caption{Parameters of best-performing graph-based convolutional neural network model}
+    \label{tab:gconv_param}
+\end{table}
+
+\subsection{Graph-based \acs{lstm} neural network experiments}
+\paragraph{} The graph-based \acs{lstm} neural network model has been tested on the problems of detection and prediction based on a sequence of graphs.
+
+The graph-based \acs{lstm} model has been implemented and tested in the same way as the standard \acs{lstm} model, conducting hyperparameters search on the same parameters and using a similar architecture. The main difference is the addition of an edge-conditioned convolutional layer (\acs{ecc}), followed by a global average-pooling, just before the use of the standard \acs{lstm}. This is necessary in order to convert the input graphs into expressive features that can be processed by the standard \acs{lstm}. In addition to the \acs{lstm} parameters, we tested different values also for the number of output filters in the edge-conditioned convolution (\texttt{g\_filters}).
+
+The graph-based \acs{lstm} model was tested both on detection and prediction problems and on different values of \texttt{look\_back} and \texttt{target\_steps\_ahead} for the creation of the input sequences; however we identified a single configuration that obtained the best results in all the tasks, even though the graph-based \acs{lstm} performance in general were poor. As already mentioned, the configuration is the same as for the standard \acs{lstm} with a \acs{ecc} and a global average-pooling layers added at the beginning. Table \ref{tab:glstm_param} presents the parameters of the graph-based \acs{lstm} neural network model that performed better.
+\begin{table}[htbp]
+    \centering
+    \begin{tabular}{ll}
+        \hline
+        \textbf{Parameter}  & \textbf{Value} \\\hline
+        epochs              & 150 \\
+        batch\_size         & 32 \\
+        depth\_lstm         & 1 \\
+        depth\_dense        & 2 \\
+        units\_lstm         & 256 \\
+        g\_filters          & 32 \\
+        activation          & \texttt{'relu'} \\
+        batch\_norm         & \texttt{True} \\
+        kernel\_regularizer & \texttt{l2(5e-3)} \\
+        dropout             & 0.4 \\
+        class\_weight       & \{0: $\frac{N}{\texttt{num\_negative}}$, 1: $\frac{N}{\texttt{num\_positive}}$\}
+    \end{tabular}
+    \caption{Parameters of best-performing graph-based \acs{lstm} neural network model}
+    \label{tab:glstm_param}
+\end{table}
+
+
+%----------------------------------------------------------------
+% Results
+%----------------------------------------------------------------
+
+\section{Results} \label{sec: results}
+\todo[inline]{Divide results for tasks, write information about look\_back, target\_steps\_ahead, stride and subsampling\_factor, insert barplots to visualize performances}
+\subsection{Detection on a time step}
+\subsection{Detection on a sequence}
+\subsection{Prediction on a sequence}
+
 
 % \begin{table}
 %     \centering
@@ -270,12 +404,4 @@ The model configuration which obtained the best results is composed by three ful
 %     \end{tabular}
 %     \caption{\label{tab:results2}Classification accuracy percentages in comparison between my model and the paper's model.}
 % \end{table}
-
-
-%----------------------------------------------------------------
-% Results
-%----------------------------------------------------------------
-
-\section{Results} \label{sec: results}
-
 
