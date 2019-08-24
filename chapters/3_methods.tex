@@ -4,126 +4,43 @@
 
 \chapter{Methods} \label{chap: methods}
 
-\paragraph{} \textit{This chapter provides a high-level overview of the work that has been done for this project and the process that has been used.}
+\paragraph{} \textit{This chapter provides a high-level overview of how the dataset has been processed, of which models have been applied on which tasks and of the reasoning behind the application of certain models to certain tasks.}
 
 %------------------------------------------------
-% Overview of the project steps
+% Data analysis and preprocessing
 %------------------------------------------------
 
-\section{Overview of the project steps} \label{sec: overview_project_steps}
-\paragraph{} The work done for this master thesis project can be summarized via a list of steps we've gone through:
-\begin{enumerate}
-    \item Definition of the problem to solve;
-    \item Research about previous approaches to the problem;
-    \item Objective of the project;
-    \item Data collection (out of the scope of this project);
-    \item Data analysis and familiarization;
-    \item Technical definition of the problem;
-    \item Choice of the machine learning and deep learning models to use;
-    \item Data preprocessing;
-    \item Application of the models to the prediction tasks;
-    \item Results evaluation;
-    \item Conclusions.
-\end{enumerate}
-The following sections will give a short description of what has been done for each project step.
+\section{Data analysis and preprocessing} \label{sec: data_analysis_preprocessing}
+\paragraph{} The data collected for this project consists of \acsp{ieeg} generated from real measurements on a patient suffering from epilepsy. The data, corresponding to 24 hours of monitoring and containing three seizures, have been prepared and provided to us by a research group of trained clinicians and epileptologists, in order to be used for this project.
 
-%------------------------------------------------
-% Step 1: Definition of the problem to solve
-%------------------------------------------------
+In order to familiarize with the data, in the first phase of the process we conducted a simple data analysis. We computed some basic statistical metrics on the \acsp{ieeg} and we generated some plots of the data to understand them better. In this way, we identified the number of electrodes used for the measurements, the number of epileptic seizures available in the dataset and their duration and, through the plots, we could also visualize the behaviour of brain's electrical signals during the seizures (see Section \ref{sec: data_analysis}).
 
-\section{Step 1: Definition of the problem to solve} \label{sec: step_definition_problem_to_solve}
-\paragraph{} The problem we decided to focus on for this project is the seizure prediction problem, which consists of predicting in advance the happening of an epileptic seizure in a person. The study has been conducted using intracranial electroencephalography data (\acs{ieeg}) and it is devoted to all the people suffering from drug-resistant epilepsy, which are forced to deal with epileptic seizures in everyday life. With the goal of being able to predict epileptic seizures few seconds in advance, the prediction would allow the neurostimulator to intervene in time on the patient brain in order to block the imminent occurrence of the seizure. The possibility to avoid even only a few of the epileptic seizures of a person would already improve by a lot her living standards.
+After that, the data has been preprocessed depending on the model and the task concerned. First, the dataset has been divided in a training set and a test set: the training set is the data that the model analyzes in order to learn from it and to identify patterns, while the test data is used to verify how much the trained model can generalize its knowledge to data that it never saw before. Since our dataset contained only three seizures, we used two seizures for the training set and the remaining one for the test set. Because of the lack of data, we could not create a validation set, so we were forced to mainly use the test set in order to evaluate the models. In most cases, the training set has been standardized, since some models, including neural networks, are very sensible to the numerical range of data features.
 
-%-----------------------------------------------------------
-% Step 2: Research about previous approaches to the problem
-%-----------------------------------------------------------
-
-\section{Step 2: Research about previous approaches to the problem} \label{sec: step_research_about_previous_approaches}
-\paragraph{} Once we identified the objective problem, we spent some time inquiring about previous approaches to the problem. With this aim, we read several scientific papers about seizure prediction in order to find out which methods have been already used and the level of performance they obtained. Through this research, we realized how complex was the problem and how difficult it was to obtain good results, even using powerful deep learning models. We also found out that, in order to have acceptable results, the majority of these models needed to be trained on a large amount of data, which in the case of epileptic seizures is difficult to gather.
-
-%------------------------------------------------
-% Step 3: Objective of the project
-%------------------------------------------------
-
-\section{Step 3: Objective of the project} \label{sec: step_objective_project}
-\paragraph{} Having a clearer idea of the problem we were going to face and of its level of complexity, we defined the objective of the project and its boundaries. We decided to conduct a study on different machine learning and deep learning models applied to the problem of seizure prediction, generating a review of models to solve this problem and looking for the best configuration for each of them. The common thread we set throughout all the project was the lack of data to train the models. Epileptic seizure data, indeed, are very difficult to gather, so we wanted to find out how well the models would have performed in a real-life scenario, having a very restricted amount of data available to learn from.
-
-%------------------------------------------------
-% Step 4: Data collection
-%------------------------------------------------
-
-\section{Step 4: Data collection} \label{sec: step_data_collection}
-\paragraph{} The data collection was out of our scope, since we were provided directly with ready-to-use data. The data collected for this project comes from a Toronto hospital and it consist of \acsp{ieeg} generated from real measurements on a patient suffering from epilepsy. The data, corresponding to 24 hours of monitoring and containing three seizures, have been prepared and provided to us in order to be used for this project.
-
-%------------------------------------------------
-% Step 5: Data analysis and familiarization
-%------------------------------------------------
-
-\section{Step 5: Data analysis and familiarization} \label{sec: step_data_analysis_familiarization}
-\paragraph{} After having identified the problem and its difficulties, having defined the boundaries of the project and having retrieved the necessary data, we finally started with the actual implementation of the project. The first phase consisted only in a simple data analysis in order to familiarize with the data. We computed some basic statistical metrics on the \acsp{ieeg} and we generated some plots of the data to understand them better. In this way, we identified the number of electrodes used for the measurements, the number of epileptic seizures available in the dataset and their duration and, through the plots, we could also visualize the behaviour of brain's electrical signals during the seizures.
-
-%------------------------------------------------
-% Step 6: Technical definition of the problem
-%------------------------------------------------
-
-\section{Step 6: Technical definition of the problem} \label{sec: step_technical_definition_problem}
-\paragraph{} With some knowledge about the data, we could define the problem in a more technical and precise way. The technical definition of the problem has been already provided in Section \ref{sec: problem_definition}, where three cases have been presented: detection on a time step, detection on a sequence and prediction on a sequence respectively. The first two cases are borderline scenarios of the prediction problem, while the third one represents a genuine problem of prediction of a future event. During this project, all the three different cases has been addressed using suitable models depending on the task.
-
-%------------------------------------------------------------------------
-% Step 7: Choice of the machine learning and deep learning models to use
-%------------------------------------------------------------------------
-
-\section{Step 7: Choice of the machine learning and deep learning models to use} \label{sec: step_choice_models_to_use}
-\paragraph{} For the choice of the machine learning and deep learning models to include in the review of methods, we wanted both to work with commonly used models and to apply suitable models for the different seizure prediction tasks. For these reasons, the choice fell on the following methods: random forest, gradient boosting and \acs{svm} models representing the group of classic machine learning methods; dense, convolutional and \acs{lstm} neural networks representing the group of standard deep learning models; graph-based convolutional and \acs{lstm} neural networks representing the group of graph-based deep learning models. Each model has been tested on the type of tasks that we though it fitted the most, based on the power and the complexity of the model.
+For the detection task on a single time step, the data has been shaped so that each sample consisted of a single time step with an associated target, that needs to be predicted. For both the detection and prediction tasks on a sequence, on the other hands, sequences needed to be generated. Therefore, the dataset has been converted in a set of sequences with a single target associated. Depending on whether we were working on detection or on prediction task, the target of each sequence corresponded to the target of the last time step in the sequence, or to the target of a future time step outside the sequence. For the graph-based models, we transformed the samples from being sequences of time steps to being sequences of graphs by computing the functional connectivity between electrodes (see Section \ref{sec: fc_graphs}). A deeper explanation about how the data has been preprocessed can be found in Section \ref{sec: data_preprocessing}.
 
 %----------------------------------------------------------------
-% Step 8: Data preprocessing
+% Application of the models to the prediction tasks
 %----------------------------------------------------------------
 
-\section{Step 8: Data preprocessing} \label{sec: step_data_preprocessing}
-\paragraph{} The data has been preprocessed in order to be prepared to be used depending on the model and the task concerned. First thing, the dataset has been divided in a training set and a test set: the training set is represented by the data that the model analyzes in order to learn from it and to identify patterns, while the test data is useful to verify how much the trained model can generalize its knowledge to data that it never saw before. Since our dataset contained only three seizures, we used two seizures for the training set and the remaining one for the test set. Because of the lack of data, we could not create a validation set, so we were forced to mainly use the test set in order to evaluate the models. In the case of deep learning models, the training set has been standardized, since neural networks are very sensible to the numerical range of data features.
+\section{Application of the models to the prediction tasks} \label{sec: models_application}
 
-For the detection task on a single time step, no additional operations on data where required, since the dataset was already provided as a big sequence of time step - target couples. For this type of task, indeed, each sample consists of a single time step and the related target needs to be predicted.
+\paragraph{} The scope of this project was to conduct a study on different machine learning and deep learning models applied to the problem of seizure prediction, generating a review of models to solve this problem and looking for the best configuration for each of them. The common thread we set throughout all the project was the lack of data to train the models. Epileptic seizure data, indeed, are very difficult to gather, so we wanted to find out how well the models would have performed in a real-life scenario, having a very restricted amount of data available to learn from.
 
-For both the detection and prediction tasks on a sequence, on the other hands, sequences needed to be generated. The dataset has been converted in a set of sequences with a single target associated, with temporal relation between time steps inside the same sequence. Depending on whether we were working on detection or on prediction task, the target of each sequence corresponded to the target of the last time step in the sequence, or to the target of a future time step outside the sequence.
+For the choice of the machine learning and deep learning models to include in the review of methods, we wanted both to work with commonly used models and to apply suitable models for the different seizure prediction tasks. For these reasons, the choice fell on the following methods: random forest, gradient boosting and \acs{svm} models representing the group of classic machine learning methods; dense, convolutional and \acs{lstm} neural networks representing the group of standard deep learning models; graph-based convolutional and \acs{lstm} neural networks representing the group of graph-based deep learning models. We applied the chosen models to the preprocessed data in order to solve the three cases of the prediction problem identified in Section \ref{sec: problem_definition}: detection on a time step, detection on a sequence and prediction on a sequence. Each model has been tested on the type of tasks that we though it fitted the most, based on the power and the complexity of the model.
 
-For the graph-based models, we transformed the samples from being sequences of time steps to being sequences of graphs. As already mentioned in Section \ref{sec: fc_graphs}, this can be done by computing the functional connectivity between electrodes and generating a corresponding graph for each time window. To do that, we considered one sequence at a time and we divided it in a fixed number of time windows, each one containing the same number of time steps. For each time window, we built a graph having one node for each electrodes and the correlation values between electrodes signal in that time window was used as edge attribute. The number of edges was limited by keeping only the edges with most significative correlation values. Through this process, we generated a graph for each time window in the sequence, therefore the sequence of time steps was transformed in a sequence of graphs. The target remained the same as for sequences of time steps.
-
-In order to have representative results, we performed k-folds cross validation for all the models and the tasks. Cross validation is a useful technique to evaluate machine learning models, especially when there is a limited amount of data at disposal. In order to perform k-folds cross validation, the dataset is divided into $k$ subsets (folds), of which $k-1$ folds are used as training set and the remaining fold as test set. The training-testing process is performed $k$ times, so that each fold is used as test set one time and it is included in the training set all the other times. To perform cross validation with our data, we divided the dataset into three subsets (3-folds cross validation), each one containing one of the three seizures, and we prepared the three corresponding training and test sets, each time using two folds as training set and the remaining fold as test set.
-
-%----------------------------------------------------------------
-% Step 9: Application of the models to the prediction tasks
-%----------------------------------------------------------------
-
-\section{Step 9: Application of the models to the prediction tasks} \label{sec: step_models_application}
-\paragraph{} At this point, we were ready to apply the chosen models to the preprocessed data in order to solve the thee cases of the prediction problem identified. Several experiments have been carried out in order to do hyperparameter search and look for the best configuration of the models for this type of tasks. All the models have been evaluated using loss, accuracy, ROC-AUC and recall, trying to find the best trade-off between the four metrics to chose the models configuration that performed the best. The metrics have been computed by taking the mean over 3-fold cross-validation to have more realistic results.
+Several experiments have been carried out in order to conduct hyperparameter search and to look for the best configuration of the models for this type of tasks. All the models have been evaluated using loss, accuracy, ROC-AUC and recall, trying to find the best trade-off between the four metrics to chose the models configuration that performed better. The metrics have been computed by taking the mean over 3-fold cross-validation to have more realistic results.
 
 \paragraph{Detection on a time step} The classic machine learning algorithms (random forest, gradient boosting and \acs{svm}) and the dense neural network have been used for the detection task on a single time step.
 
-We tested some models on this type of task for completeness, in order to see the performance on the baseline case of prediction, but we did not spent much time looking for the best solution as we did not expected to obtain very good results. Actually in this case, given the complex nature of the problem, we believe in the assumption that the information determining the presence of an epileptic seizure is contained in a sequence of time steps and in the relation between their corresponding brain activity's values, not in the values of a single time step.
+We tested some models on this type of task for completeness, in order to examine the performance on the baseline case of prediction, but we did not dwell on the search for the best solution as we did not expect to obtain very good results. Given the complex nature of the problem, it is more reasonable to assume that the information determining the presence of an epileptic seizure is contained in a sequence of time steps and in the relation between their corresponding brain activity's values, not in the values of a single time step.
 
 \paragraph{Detection on a sequence} Standard and graph-based convolutional and \acs{lstm} neural networks have been tested on the detection task on a sequence. 
 
-Also for the models tested on the detection task on a sequence, we did not experiment as much as for the prediction task on a sequence, but we wanted to have an idea of how the models behave in this other baseline situation. In this case, we were testing whether the brain activity corresponding to the time step we wanted to predict together with the values of the time steps just before it were decisive for the prediction. We supposed that, by having available also the information from previous time steps, the models should have been able to perform better on detection on a sequence with respect to detection on a single time step.
+Like in the previous case, for the detection task on a sequence we did not experiment as much as for the prediction task on a sequence, but our intention was to gather some knowledge about the behaviour of the models in this second baseline situation. In this case, we wanted to understand if the added information from time steps prior to the one we wanted to predict could be decisive for the prediction. We supposed that, by having available also the information from previous time steps, the models should have been able to perform better on the task of detection on a sequence with respect to the task of detection on a single time step.
 
 \paragraph{Prediction on a sequence} Standard and graph-based convolutional and \acs{lstm} neural networks have been tested also on the detection task on a sequence.
 
-The prediction task on a sequence has been the main focus of the project, since it is probably the most useful for real-world implementations; therefore, it was also the task for which we spent more time looking for the best solution. In this case, we were trying to understand whether the information of a sequence of time steps some time in the past were crucial to predict a time step in the future with respect to the sequence. The experiments have been conducted using different time distances between the sequence and the corresponding future time step to predict. In this way, we could determine how far the models where able to predict and which was the distance with which they performed the best.
+The prediction task on a sequence has been the main focus of the project, since it is the most useful for real-world applications; therefore, it was also the task for which we spent more time looking for the best solution. In this case, we were trying to understand whether the information of a sequence of time steps some time in the past were crucial to predict a time step in the future with respect to the sequence. The experiments have been conducted using different time distances between the sequence and the corresponding future time step to predict. In this way, we could determine how far the models where able to predict and which was the distance with which they performed the best.
 
 \paragraph{} The choice of the models to test on the different prediction tasks has been based on the models abilities. Random forest, gradient boosting, \acs{svm} and dense neural network models have been used for the detection task on a time step because their level of complexity seems to be suitable for the problem and also because they are not able to process sequences of data, so they could not have been useful for the other two problem's cases. On the other hand, standard and graph-based convolutional and \acs{lstm} neural network models have been used both for the detection and prediction tasks on a sequence, both because of the higher complexity required by the problem and because they are convenient models to process sequences.
-
-%----------------------------------------------------------------
-% Step 10: Results evaluation
-%----------------------------------------------------------------
-
-\section{Step 10: Results evaluation} \label{sec: step_restults_evaluation}
-\paragraph{} For the models evaluation, as already mentioned, four metrics have been used: loss, accuracy, ROC-AUC and recall. In order to evaluate models, we chose as best models the ones that obtained highest recall on test data, while still reaching decent ROC-AUC and loss values. For this type of task, recall value is actually very important, as it tell us how many seizure time steps have been correctly predicted over the total amount of real seizure time steps. Also ROC-AUC had a crucial role in models evaluation, since we want the classifiers to be consistent and to avoid random prediction. Of course, loss and accuracy have not been ignored, since the models need to correctly classify more than the majority of time steps in order to be significant.
-
-To sum up, in order to choose the preferred configuration for the models, we looked for the best trade-off between the four metrics, slightly prioritizing recall over the others. Following this logic, we selected the best model for each machine learning and deep learning method used on each type of task. This allowed us to make a comparison between the performances of different methods for each task.
-
-%----------------------------------------------------------------
-% Step 11: Conclusions
-%----------------------------------------------------------------
-
-\section{Step 11: Conclusions} \label{sec: step_conclusions}
-\paragraph{} Provided with all the results from the models for the detection and prediction tasks, we were able to draw conclusions. By evaluating and comparing the results, we could determine what worked better and what worse on which type of tasks. We were also able to confirm of reject some assumptions we made at the beginning and to create new hypotheses based on the results. Through the project and all the experiments, we were able to provide to the reader a quite complete overview of machine learning and deep learning methods performances on the tasks of prediction of epileptic seizures.
