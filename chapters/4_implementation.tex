@@ -42,52 +42,52 @@
 First, we identified the position of the seizures in the data and their length. As already mentioned, the data contains three seizures in total, each one having a duration between $13\,000$ and $15\,000$ time steps, for a total of $42\,000$ time steps of seizure. This corresponds to 26 to 30 seconds of duration for each seizure and 84 seconds of seizure in total. Since we had few seizure time steps and the dataset was heavily unbalanced, we had to significantly subsample the data. For this reason, from the beginning of the project we considered only a portion of data around each one of the three seizures, obtaining $450\,000$ time steps (15 minutes) to work with between seizure and non-seizure data in total. This should give an idea of how much limited the amount of useful data was for this project.
 
 Some basic statistical measurements have been applied to the \acs{ieeg} data in order to familiarize with its features. The measured voltage in the \acs{ieeg} vary between about $-9\,500$ and $9\,800$ \acs{uv}, covering a range of about $19\,300$ \acs{uv}. Each electrode's signal oscillates through time with a standard deviation of around 82 \acs{uv} and the various electrodes signals cover different areas of the \acs{ieeg} voltage range based on their placement on the brain surface. In Figure \ref{fig:plot_seizures} the plots of the \acs{ieeg} around the three seizures is shown. The start and end times of the seizures in each plot are indicated by red vertical lines.
-\todo{Change following 3 iEEGs to high-quality corresponding images}
 \newpage
-\begin{figure}[H]
-    \centering
-    \begin{subfigure}[t]{0.7\textwidth}
-		\includegraphics[width=1\textwidth]{plot_seizure1_lowquality}
-        \caption{First epileptic seizure}
-        \label{fig:plot_seizure1}
-	\end{subfigure}
-	~
-	\begin{subfigure}[t]{0.7\textwidth}
-		\includegraphics[width=1\textwidth]{plot_seizure2_lowquality}
-        \caption{Second epileptic seizure}
-        \label{fig:plot_seizure2}
-    \end{subfigure}
-    ~
-    \begin{subfigure}[t]{0.7\textwidth}
-		\includegraphics[width=1\textwidth]{plot_seizure3_lowquality}
-        \caption{Third epileptic seizure}
-        \label{fig:plot_seizure3}
-	\end{subfigure}
-    \caption{Plots of the \acs{ieeg} around the three epileptic seizures (we suggest to zoom-in the figures in the pdf file). The \acs{ieeg} plots show the voltage values of the 90 channels with respect to time, with y axis in common (hence the time-series overlap). The onset and offset of the seizures are marked by red lines.}
-    \label{fig:plot_seizures}
-\end{figure}
+% \todo{Change following 3 iEEGs to high-quality corresponding images}
 % \begin{figure}[H]
 %     \centering
 %     \begin{subfigure}[t]{0.7\textwidth}
-% 		\includegraphics[width=1\textwidth]{plot_seizure1}
+% 		\includegraphics[width=1\textwidth]{plot_seizure1_lowquality}
 %         \caption{First epileptic seizure}
 %         \label{fig:plot_seizure1}
 % 	\end{subfigure}
 % 	~
 % 	\begin{subfigure}[t]{0.7\textwidth}
-% 		\includegraphics[width=1\textwidth]{plot_seizure2}
+% 		\includegraphics[width=1\textwidth]{plot_seizure2_lowquality}
 %         \caption{Second epileptic seizure}
 %         \label{fig:plot_seizure2}
 %     \end{subfigure}
 %     ~
 %     \begin{subfigure}[t]{0.7\textwidth}
-% 		\includegraphics[width=1\textwidth]{plot_seizure3}
+% 		\includegraphics[width=1\textwidth]{plot_seizure3_lowquality}
 %         \caption{Third epileptic seizure}
 %         \label{fig:plot_seizure3}
 % 	\end{subfigure}
 %     \caption{Plots of the \acs{ieeg} around the three epileptic seizures (we suggest to zoom-in the figures in the pdf file). The \acs{ieeg} plots show the voltage values of the 90 channels with respect to time, with y axis in common (hence the time-series overlap). The onset and offset of the seizures are marked by red lines.}
 %     \label{fig:plot_seizures}
 % \end{figure}
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[t]{0.7\textwidth}
+		\includegraphics[width=1\textwidth]{plot_seizure1}
+        \caption{First epileptic seizure}
+        \label{fig:plot_seizure1}
+	\end{subfigure}
+	~
+	\begin{subfigure}[t]{0.7\textwidth}
+		\includegraphics[width=1\textwidth]{plot_seizure2}
+        \caption{Second epileptic seizure}
+        \label{fig:plot_seizure2}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[t]{0.7\textwidth}
+		\includegraphics[width=1\textwidth]{plot_seizure3}
+        \caption{Third epileptic seizure}
+        \label{fig:plot_seizure3}
+	\end{subfigure}
+    \caption{Plots of the \acs{ieeg} around the three epileptic seizures (we suggest to zoom-in the figures in the pdf file). The \acs{ieeg} plots show the voltage values of the 90 channels with respect to time, with y axis in common (hence the time-series overlap). The onset and offset of the seizures are marked by red lines.}
+    \label{fig:plot_seizures}
+\end{figure}
 \newpage
 
 Looking at Figure \ref{fig:plot_seizures}, we are not able to precisely identify the presence of a seizure in the \acs{ieeg}, since the task of seizure detection is too complex for an untrained eye and the dynamic of the electrodes signals does not seem to undergo a big change in correspondence of the beginning of a seizure. In any case, we expect the seizure to be represented not directly by the dynamic of the signals, but by the non-linear relations between the electrodes signal's dynamic through time.
