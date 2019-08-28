@@ -170,7 +170,7 @@ This procedure has been implemented with the function \texttt{get\_fc} from \tex
 \section{Experiments} \label{sec: experiments}
 \paragraph{} As already mentioned in Section \ref{sec: models_application}, a big amount of experiments have been conducted in order to apply the chosen machine learning and deep learning models to the three cases of the problem of epileptic seizures prediction. These experiments helped to identify the best-performing configuration for each model on the task at hand. This section will present the models architectures and parameters that have been tested and the best configuration that has been selected for each model, which generated the results described in section \ref{sec: results}. The best configuration was chosen by looking for the best trade-off between the evaluation metrics over the 3-fold cross-validation.
 
-\subsection{Support Vector Machine experiments}
+\subsection{Support Vector Machines experiments}
 \paragraph{} The \acs{svm} model has been tested on the problem of detection based on a single time step. We did not make a lot of experiments using \acs{svm}, since the poor results immediately suggested that this machine learning algorithm is too weak to handle the complexity of the seizure prediction task.
 
 In order to test the \acs{svm} model, we used the \texttt{svm.SVC} implementation from scikit-learn library. We kept all the parameters to the default values, except for the \texttt{gamma} and \texttt{class\_weight} parameters. The \acs{svm} has been tested with a penalty parameter $C=1$ and using a Gaussian radial basis function (\acs{rbf}) kernel. The \texttt{gamma} value was set to \texttt{'scale'}, that corresponds to $\frac{1}{F \cdot var(X)}$, where $F$ is the number of features and $var(X)$ is the variance of the input features. We tested both a balanced and an unbalanced version of the \acs{svm} by setting the \texttt{class\_weight} parameter to \texttt{'balanced'} or leaving it to \texttt{None} and we obtained slightly better results using the balanced configuration of the model. Table \ref{tab:svm_param} presents the parameters of the \acs{svm} model that performed better.
@@ -188,7 +188,7 @@ In order to test the \acs{svm} model, we used the \texttt{svm.SVC} implementatio
     \label{tab:svm_param}
 \end{table}
 
-\subsection{Random forest experiments}
+\subsection{Random forests experiments}
 \paragraph{} The random forest model has been tested on the problem of detection based on a single time step.
 
 In order to test the random forest model, we used the \texttt{ensemble.RandomForest}-\texttt{Classifier} implementation from scikit-learn library. We kept all the parameters to the default values, except for the \texttt{n\_estimators}, the \texttt{max\_depth} and \texttt{class\_weight} parameters. The \texttt{criterion} parameter to measure the quality of a split was set to \texttt{'gini'}, which corresponds to the Gini impurity function. We tried several values for \texttt{n\_estimators}, which is the number of trees in the forest, and for \texttt{max\_depth}, which is the maximum depth of the tree, in order to find the best balance between the two. We tested both a balanced and an unbalanced version of the random forest classifier by setting the \texttt{class\_weight} parameter to \texttt{'balanced'} or leaving it to \texttt{None} and there was no resulting difference between the two configurations. Table \ref{tab:randomforest_param} presents the parameters of the random forest model that performed better.
@@ -224,7 +224,7 @@ In order to test the gradient boosting model, we used the \texttt{XGBClassifier}
     \label{tab:gradientboosting_param}
 \end{table}
 
-\subsection{Dense neural network experiments}
+\subsection{Dense neural networks experiments}
 \paragraph{} The dense neural network model has been tested on the problem of detection based on a single time step.
 
 In order to test the \acs{fcnn} model, we used the \texttt{Dense} and \texttt{Dropout} layers implementation from Tensorflow's Keras library. We investigated several configurations of the model by trying different values for the number of dense layers (\texttt{depth\_dense}), the number of units in each layer (\texttt{units}), the activation function to use (\texttt{activation}), the amount of $\ell_2$ regularization to apply to the kernel (\texttt{kernel\_regularizer}) and the dropout rate to apply between the dense layers (\texttt{dropout}). During the training of the model, we used the \texttt{class\_weight} parameter to compensate the unbalance of the dataset.
@@ -248,7 +248,7 @@ The model configuration which obtained the best results is composed by three ful
     \label{tab:dense_param}
 \end{table}
 
-\subsection{Convolutional neural network experiments}
+\subsection{Convolutional neural networks experiments}
 \paragraph{} The convolutional neural network model has been tested on the problems of detection and prediction based on a sequence of time steps.
 
 In order to test the \acs{cnn} model, we used the \texttt{Conv1D}, \texttt{MaxPooling1D}, \texttt{Flatten}, \texttt{Dense}, \texttt{Dropout} and \texttt{BatchNormalization} layers implementation from Tensorflow's Keras library. We investigated several configurations of the model by first trying different values for the main parameters of the neural network: the number of convolutional layers (\texttt{depth\_conv}), the number of dense layers for the prediction (\texttt{depth\_dense}), the number of output filters in the convolution (\texttt{filters}), the length of the convolution window (\texttt{kernel\_size}), the activation function to use (\texttt{activation}), the amount of $\ell_2$ regularization to apply to the kernel (\texttt{kernel\_regularizer}), the presence of batch normalization (\texttt{batch\_norm}) and the dropout rate (\texttt{dropout}) to apply between the dense layers. During the training of the model, we used the \texttt{class\_weight} parameter to compensate the unbalance of the dataset.
@@ -291,7 +291,7 @@ Table \ref{tab:conv_param} presents the parameters of the dense neural network m
     \label{tab:conv_param}
 \end{table}
 
-\subsection{\acs{lstm} neural network experiments}
+\subsection{\acs{lstm} neural networks experiments}
 \paragraph{} The \acs{lstm} neural network model has been tested on the problems of detection and prediction based on a sequence of time steps.
 
 In order to test the \acs{lstm} model, we used the \texttt{LSTM}, \texttt{Dense}, \texttt{Dropout} and \texttt{Batch}-\texttt{Normalization} layers implementation from Tensorflow's Keras library. We investigated several configurations of the model by trying different values for the number of \acs{lstm} layers (\texttt{depth\_lstm}), the number of dense layers (\texttt{depth\_dense}), the number of units in each \acs{lstm} layer (\texttt{units\_lstm}), the activation function to use (\texttt{activation}), the amount of $\ell_2$ regularization to apply to the kernel (\texttt{kernel\_regularizer}), the presence of batch normalization (\texttt{batch\_norm}) and the dropout rate (\texttt{dropout}) to apply between the layers. During the training of the model, we used the \texttt{class\_weight} parameter to compensate the unbalance of the dataset.
@@ -317,7 +317,7 @@ The \acs{lstm} model was tested both on detection and prediction problems and on
     \label{tab:lstm_param}
 \end{table}
 
-\subsection{Graph-based convolutional neural network experiments}
+\subsection{Graph-based convolutional neural networks experiments}
 \paragraph{} The graph-based convolutional neural network model has been tested on the problems of detection and prediction based on a sequence of graphs.
 
 The graph-based \acs{cnn} model has been implemented and tested in the same way as the standard \acs{cnn} model, conducting hyperparameters search on the same parameters and using a similar architecture. The main difference is the addition of an edge-conditioned convolutional layer (\acs{ecc}), followed by a global average-pooling, just before the use of the standard \acs{cnn}. This is necessary in order to convert the input graphs into expressive features that can be processed by the standard \acs{cnn}. In addition to the \acs{cnn} parameters, we tested different values also for the number of output filters in the edge-conditioned convolution (\texttt{g\_filters}).
@@ -349,7 +349,7 @@ The graph-based \acs{cnn} model was tested both on detection and prediction prob
     \label{tab:gconv_param}
 \end{table}
 
-\subsection{Graph-based \acs{lstm} neural network experiments}
+\subsection{Graph-based \acs{lstm} neural networks experiments}
 \paragraph{} The graph-based \acs{lstm} neural network model has been tested on the problems of detection and prediction based on a sequence of graphs.
 
 The graph-based \acs{lstm} model has been implemented and tested in the same way as the standard \acs{lstm} model, conducting hyperparameters search on the same parameters and using a similar architecture. The main difference is the addition of an edge-conditioned convolutional layer (\acs{ecc}), followed by a global average-pooling, just before the use of the standard \acs{lstm}. This is necessary in order to convert the input graphs into expressive features that can be processed by the standard \acs{lstm}. In addition to the \acs{lstm} parameters, we tested different values also for the number of output filters in the edge-conditioned convolution (\texttt{g\_filters}).
